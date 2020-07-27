@@ -1,15 +1,15 @@
 {
-  "name": "thirdspace-offsite",
+  "name": "xccelerate-offsite",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "lint": "lerna run --parallel lint",
     "start": "lerna run --parallel start",
-    "start:client": "yarn workspace @thirdspace-offsite/client start",
-    "start:server": "yarn workspace @thirdspace-offsite/server start",
+    "start:client": "yarn workspace @xccelerate-offsite/client start",
+    "start:server": "yarn workspace @xccelerate-offsite/server start",
     "test": "yarn test:client && yarn test:server",
-    "test:client": "yarn workspace @thirdspace-offsite/client test --watchAll=false",
-    "test:server": "yarn workspace @thirdspace-offsite/server test"
+    "test:client": "yarn workspace @xccelerate-offsite/client test --watchAll=false",
+    "test:server": "yarn workspace @xccelerate-offsite/server test"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
