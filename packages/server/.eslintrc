@@ -1,0 +1,25 @@
+{
+  "parser": "babel-eslint",
+  "env": { "node": true, "jest": true },
+  "extends": ["airbnb-base", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "consistent-return": ["off"],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true
+      }
+    ],
+    "prettier/prettier": [
+      "error",
+      {
+        "trailingComma": "es5",
+        "tabWidth": 2,
+        "semi": true,
+        "singleQuote": true
+      }
+    ],
+    "prefer-destructuring": ["error", {"object": true, "array": false}]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@thirdspace-offsite/server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint '**/*.js'",
+    "start": "node src/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "~4.16.1"
+  },
+  "devDependencies": {
+    "supertest": "^4.0.2"
+  }
+}
