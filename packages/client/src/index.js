@@ -31,6 +31,11 @@ function Main() {
           <Route exact path="/" component={Lobby} />
           <Route path="/room" component={Classroom} />
         </div>
+        <footer>
+          <a href="#terms-of-service">Terms of Service</a>
+          <a href="#support">Support</a>
+          <span>© 2020 Variable.</span>
+        </footer>
       </div>
     </Router>
   );

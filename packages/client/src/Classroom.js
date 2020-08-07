@@ -180,7 +180,8 @@ function Classroom() {
         mode="javascript"
         theme="monokai"
         name="amplify-code-editor"
-        placeholder='console.log("hello world!")'
+        placeholder='console.log("hello world!");'
+        // value=""
         className="col-8"
         editorProps={{ $blockScrolling: true }}
       />
