@@ -1,0 +1,57 @@
+// Put Bootstrap custom variables here
+
+$font-size-base: 1.1rem
+
+// Bootstrap Required
+@import "../../node_modules/bootstrap/scss/_functions.scss"
+@import "../../node_modules/bootstrap/scss/_variables.scss"
+@import "../../node_modules/bootstrap/scss/_mixins.scss"
+
+// Bootstrap Optional
+@import "../../node_modules/bootstrap/scss/_reboot.scss"
+@import "../../node_modules/bootstrap/scss/_type.scss"
+@import "../../node_modules/bootstrap/scss/_images.scss"
+@import "../../node_modules/bootstrap/scss/_code.scss"
+@import "../../node_modules/bootstrap/scss/_grid.scss"
+@import "../../node_modules/bootstrap/scss/_utilities.scss"
+@import "../../node_modules/bootstrap/scss/_nav.scss"
+@import "../../node_modules/bootstrap/scss/_navbar.scss"
+
+
+// Put global styles and resets here
+body
+  margin: 0
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+
+code
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace
+
+div
+  box-sizing: border-box
+
+.amplify-app
+  .top-page-content
+    height: 45px
+  .content
+    background-color: #487b85
+    //padding: 1rem
+    height: calc(100vh - 45px)
+
+
+//.amplify-logo
+//  height: 3rem
+
+//.amplify-header
+//  background-color: #282c34
+//  min-height: 100vh
+//  display: flex
+//  flex-direction: column
+//  align-items: center
+//  justify-content: center
+//  font-size: calc(10px + 2vmin)
+//  color: white
+//
+//.App-link
+//  color: #61dafb
