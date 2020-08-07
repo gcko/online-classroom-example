@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import AceEditor from 'react-ace';
@@ -11,17 +12,16 @@ function overrideConsole(consoleElement) {
   function appendMessage(text) {
     const span = document.createElement('span');
     span.className = 'message';
-    // span.setAttribute('style', 'white-space: pre;');
     span.textContent = text;
     consoleElement.appendChild(span);
   }
-  const defaultLog = console.log;
-  const defaultClear = console.clear;
-  const defaultError = console.error;
-  const defaultWarn = console.warn;
+  const defaultLog = console.log.bind(window);
+  const defaultClear = console.clear.bind(window);
+  const defaultError = console.error.bind(window);
+  const defaultWarn = console.warn.bind(window);
 
   // Override console.log
-  console.log = function(...args) {
+  console.log = function log(...args) {
     let currentLog = '';
     const argsArray = [...args];
     for (let i = 0; i < argsArray.length; i += 1) {
@@ -46,7 +46,7 @@ function overrideConsole(consoleElement) {
   };
 
   // Override console.clear
-  console.clear = function() {
+  console.clear = function clear() {
     // Clear out any messages, add console prompt
     consoleElement.innerHTML = `» `;
     // Allow the default console action to happen
@@ -54,7 +54,7 @@ function overrideConsole(consoleElement) {
   };
 
   // Override console.error
-  console.error = function(e) {
+  console.error = function error(e) {
     let currentLog = '';
     currentLog += `Error: ${e}`;
     // Console prompt
@@ -68,7 +68,7 @@ function overrideConsole(consoleElement) {
   };
 
   // Override console.warn
-  console.warn = function(w) {
+  console.warn = function warn(w) {
     let currentLog = '';
     currentLog += `Warning: ${w}`;
     // Console prompt
@@ -84,10 +84,7 @@ function overrideConsole(consoleElement) {
 // create our own local versions of window and document with limited functionality.
 // Do it once and before other code executes.
 const sandboxGlobals = {
-  window: {
-    // console: getOverriddenConsole(document.getElementById('console')), // allow a reference to console
-    // console: console, // allow a reference to the console
-  },
+  window: {},
   document: {},
 };
 function sandboxedEval(codeEl) {
@@ -101,7 +98,6 @@ function sandboxedEval(codeEl) {
       // console.log(`param: ${param}`);
       // eslint-disable-next-line no-prototype-builtins
       if (Object.prototype.hasOwnProperty.call(sandboxedGlobals, param)) {
-        // console.log(`arg for param: ${sandboxedGlobals[param]}`);
         args.push(sandboxedGlobals[param]);
         params.push(param);
       }
@@ -131,44 +127,45 @@ function sandboxedEval(codeEl) {
   }
 }
 
+function kbdSecondKey(e) {
+  if (e.key === 'i') console.clear();
+  const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
+  if (e.key === 'Enter') {
+    sandboxedEval(editorTextEl);
+  }
+}
+function kbdFirstKey(e) {
+  if (e.key === 'Control') window.addEventListener('keydown', kbdSecondKey);
+}
+function kbuFirstKey(e) {
+  if (e.key === 'Control') window.removeEventListener('keydown', kbdSecondKey);
+}
 function handleKeyboardShortcuts(on = true) {
-  function kbd(e) {
-    if (e.key === 'i') console.clear();
-    const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
-    if (e.key === 'Enter') {
-      sandboxedEval(editorTextEl);
-      // try {
-      //   eval(editorTextEl.innerText);
-      // } catch (error) {
-      //   console.error(error);
-      // }
-    }
-  }
-  function kbdCtrl(e) {
-    if (e.key === 'Control') window.addEventListener('keydown', kbd);
-  }
-  function kbuCtrl(e) {
-    if (e.key === 'Control') window.removeEventListener('keydown', kbd);
-  }
   if (on) {
-    window.addEventListener('keydown', kbdCtrl);
-    window.addEventListener('keyup', kbuCtrl);
+    window.addEventListener('keydown', kbdFirstKey);
+    window.addEventListener('keyup', kbuFirstKey);
   }
   if (!on) {
-    window.removeEventListener('keydown', kbdCtrl);
-    window.removeEventListener('keyup', kbuCtrl);
+    window.removeEventListener('keydown', kbdFirstKey);
+    window.removeEventListener('keyup', kbuFirstKey);
   }
 }
 
 function Classroom() {
   useEffect(() => {
     const defaultLog = console.log;
+    const defaultWarn = console.warn;
+    const defaultError = console.error;
+    const defaultClear = console.clear;
     handleKeyboardShortcuts(true);
     // Override console *after* sandboxing eval
     overrideConsole(document.getElementById('console'));
     return function cleanup() {
       // remove override
       console.log = defaultLog;
+      console.warn = defaultWarn;
+      console.error = defaultError;
+      console.clear = defaultClear;
       handleKeyboardShortcuts(false);
     };
   });
