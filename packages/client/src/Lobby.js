@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import {
@@ -48,11 +48,17 @@ function RoomCard({ isValid }) {
     </div>
   );
 }
-// Store the state of changes
-const changed = {};
 
 function Lobby() {
   const [isValid, setIsValid] = useState(false);
+  // Store the state of changes
+  const changed = useRef({});
+  useEffect(() => {
+    return function cleanup() {
+      // cleanup changes after navigating away
+      changed.current = {};
+    };
+  });
 
   function formValidator(e) {
     const parentEl = e.target.parentElement;
@@ -67,12 +73,12 @@ function Lobby() {
       // validate that
     }
     if (
-      !(e.target.id in changed) &&
+      !(e.target.id in changed.current) &&
       parentEl.classList.contains('form-group')
     ) {
       // Add validation UI state after initial change only
       parentEl.classList.add('was-validated');
-      changed[e.target.id] = true;
+      changed.current[e.target.id] = true;
     }
     // Connect state validity to the form's validity
     setIsValid(e.target.form.checkValidity());
