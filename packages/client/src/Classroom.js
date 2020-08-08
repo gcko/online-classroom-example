@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
+import { Style } from 'react-style-tag';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
@@ -172,6 +173,18 @@ function Classroom() {
 
   return (
     <div className="classroom row">
+      <Style>
+        {`
+        .amplify-app > footer a,
+          .amplify-app > footer a,
+          .amplify-app > footer a:visited,
+          .amplify-app > footer a:hover,
+          .amplify-app > footer a:link,
+          .amplify-app > footer span {
+          color: #FFEFFF;
+        }
+      `}
+      </Style>
       <Helmet>
         {/* TODO programmatic title */}
         <title>JS 101 | Amplify</title>

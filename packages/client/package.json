@@ -12,16 +12,18 @@
     "node-sass": "^4.14.1",
     "react": "^16.13.0",
     "react-ace": "^9.1.2",
+    "react-bootstrap-icons": "^1.0.3-alpha5",
     "react-dom": "^16.13.0",
     "react-helmet": "^6.1.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.0"
+    "react-scripts": "3.4.0",
+    "react-style-tag": "^2.0.1"
   },
   "scripts": {
     "lint": "eslint '**/*.js'",
-    "start": "react-scripts start",
+    "start": "react-scripts start --no-cache",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --no-cache",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

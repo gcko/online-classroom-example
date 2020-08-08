@@ -11,9 +11,9 @@ function Main() {
     <Router>
       <div className="amplify-app container-fluid">
         <div className="top-page-content row">
-          <h1 className="col-3">
+          <h2 className="col-3">
             Amplify <small>your skill</small>
-          </h1>
+          </h2>
           <ul className="nav col-9">
             <li className="nav-item">
               <Link to="/" className="nav-link">

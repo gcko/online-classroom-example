@@ -13,8 +13,17 @@ $font-size-base: 1.1rem
 @import "../../node_modules/bootstrap/scss/_code.scss"
 @import "../../node_modules/bootstrap/scss/_grid.scss"
 @import "../../node_modules/bootstrap/scss/_utilities.scss"
+@import "../../node_modules/bootstrap/scss/_buttons.scss"
+@import "../../node_modules/bootstrap/scss/_forms.scss"
 @import "../../node_modules/bootstrap/scss/_nav.scss"
 @import "../../node_modules/bootstrap/scss/_navbar.scss"
+@import "../../node_modules/bootstrap/scss/_card.scss"
+
+// Put Bootstrap additions here
+.conditional-feedback
+  @extend .invalid-feedback
+  display: block
+  color: $text-muted
 
 // Put global styles and resets here
 body
@@ -26,11 +35,18 @@ body
 .amplify-app
   .top-page-content
     height: 45px
+    background-color: #496a8e
+    .nav
+      .nav-link, .nav-link:active, .nav-link:link
+        color: #FFEFFF
+      .nav-link:hover
+        color: #a9a9a9
   .content
-    background-color: #487b85
     //padding: 1rem
     height: calc(100vh - 45px)
   > footer
+    position: absolute
+    width: 100vw
     bottom: 0
     margin-top: -1.2rem
     font-size: .8rem
@@ -38,6 +54,6 @@ body
     justify-content: center
     flex-direction: row
     a, a:visited, a:hover, a:link, span
-      color: #FFEFFF
+      color: #212529
     a
       margin-right: 3rem
