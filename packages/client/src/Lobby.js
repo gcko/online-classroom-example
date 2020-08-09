@@ -15,7 +15,7 @@ function DisabledCardContents() {
         Finalize room selection...
       </p>
       <Link
-        to="/room"
+        to="/"
         role="button"
         aria-disabled="true"
         className="btn btn-outline-secondary disabled col-2"

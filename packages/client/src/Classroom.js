@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import Redirect from 'react-router-dom/es/Redirect';
+import React, { useEffect, useRef } from 'react';
+import { Redirect, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Style } from 'react-style-tag';
 import AceEditor from 'react-ace';
@@ -190,8 +189,8 @@ function ValidClassroom({ params }) {
 }
 
 function Classroom() {
-  const [isValid, setIsValid] = useState(false);
-
+  // const [isValid, setIsValid] = useState(false);
+  const isValid = useRef(false);
   // Grab the params from the Route
   const params = useParams();
 
@@ -214,14 +213,8 @@ function Classroom() {
     }
     return false;
   }
-
-  useEffect(() => {
-    setIsValid(roomIdIsValid());
-    return function cleanup() {
-      // cleanup changes after navigating away
-      setIsValid(false);
-    };
-  });
+  // Set the referenced state for isValid
+  isValid.current = roomIdIsValid();
 
   useEffect(() => {
     const defaultLog = console.log;
@@ -238,13 +231,14 @@ function Classroom() {
       console.error = defaultError;
       console.clear = defaultClear;
       handleKeyboardShortcuts(false);
+      isValid.current = false;
     };
-  });
+  }, []); // empty array means call only once
 
   return (
     // First check the roomId is valid
     <>
-      {isValid ? (
+      {isValid.current ? (
         <ValidClassroom params={params} />
       ) : (
         <Redirect

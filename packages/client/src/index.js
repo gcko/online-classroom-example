@@ -12,7 +12,9 @@ function Main() {
       <div className="amplify-app container-fluid">
         <div className="top-page-content row">
           <h2 className="col-3">
-            Amplify <small>your skill</small>
+            <Link to="/">
+              Amplify <small>your skill</small>
+            </Link>
           </h2>
           <ul className="nav col-9">
             <li className="nav-item">
@@ -30,7 +32,7 @@ function Main() {
         <div className="content">
           <Route exact path="/" component={Lobby} />
           {/* catch routing to base path as well */}
-          <Route path="/room" component={Classroom} />
+          <Route exact path="/room" component={Classroom} />
           <Route path="/room/:roomId" component={Classroom} />
         </div>
         <footer>
