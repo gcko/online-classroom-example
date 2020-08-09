@@ -26,12 +26,12 @@ function DisabledCardContents() {
   );
 }
 
-function EnabledCardContents({ roomId }) {
+function EnabledCardContents({ room }) {
   return (
     <div className="card-body row align-items-center">
-      <p className="card-text col-10 mb-0">Javascript 101</p>
+      <p className="card-text col-10 mb-0">{room.name}</p>
       <Link
-        to={`/room/${roomId}`}
+        to={`/room/${room.roomId}`}
         role="button"
         className="btn btn-outline-secondary col-2"
       >
@@ -41,21 +41,17 @@ function EnabledCardContents({ roomId }) {
   );
 }
 
-function RoomCard({ isValid, roomId }) {
+function RoomCard({ isValid, room }) {
   return (
     <div className="card mt-3">
-      {isValid ? (
-        <EnabledCardContents roomId={roomId} />
-      ) : (
-        <DisabledCardContents />
-      )}
+      {isValid ? <EnabledCardContents room={room} /> : <DisabledCardContents />}
     </div>
   );
 }
 
 function Lobby() {
   const [isValid, setIsValid] = useState(false);
-  const [roomId, setRoomId] = useState(null);
+  const [room, setRoom] = useState(null);
   // Store the state of changes
   const changed = useRef({});
   useEffect(() => {
@@ -87,11 +83,17 @@ function Lobby() {
     const validRooms = [
       {
         roomId: '11111111',
+        name: 'Javascript 101',
       },
       {
         roomId: 'ABCDEFGH',
+        name: 'Javascript 201',
       },
     ];
+    if (e.target.id === 'room-id') {
+      // Always unset the room to ensure valid state of form
+      setRoom(null);
+    }
     // Specifically check if the roomId is a valid roomId
     if (e.target.id === 'room-id' && !e.target.validity.patternMismatch) {
       const maybeRoomId = e.target.value;
@@ -99,6 +101,7 @@ function Lobby() {
       for (let i = 0; i < validRooms.length; i += 1) {
         if (maybeRoomId === validRooms[i].roomId) {
           validRoomFound = true;
+          setRoom(validRooms[i]);
           // remove validation message if it existed
           e.target.setCustomValidity('');
           document.getElementById('not-real-room-id').classList.add('d-none');
@@ -155,9 +158,6 @@ function Lobby() {
             pattern="[0-9a-zA-Z]{8}"
             maxLength="8"
             required
-            onChange={function handleChange(e) {
-              setRoomId(e.target.value);
-            }}
           />
           <div id="not-real-room-id" className="invalid-tooltip d-none">
             This room ID has not been created yet
@@ -170,7 +170,7 @@ function Lobby() {
             <ExclamationCircle /> May only contain alphanumeric characters
           </div>
         </div>
-        <RoomCard isValid={isValid} roomId={roomId} />
+        <RoomCard isValid={isValid} room={room} />
       </form>
     </div>
   );
