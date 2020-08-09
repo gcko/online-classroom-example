@@ -245,7 +245,6 @@ function Classroom() {
         stateOfValidity = validRoles.indexOf(params.role) >= 0;
       }
     }
-    // return true;
     return stateOfValidity;
   }
   // Set the referenced state for isValid
