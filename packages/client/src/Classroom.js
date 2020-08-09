@@ -8,6 +8,9 @@ import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
 import './Classroom.sass';
 
+const ROLE_INSTRUCTOR = 'instructor';
+const ROLE_STUDENT = 'student';
+
 // Custom Dev Console output
 // https://github.com/iambenkay/js-ide/blob/master/index.html
 function overrideConsole(consoleElement) {
@@ -153,21 +156,59 @@ function handleKeyboardShortcuts(on = true) {
   }
 }
 
-function ValidClassroom({ params }) {
-  function handleRunCode() {
+class ValidRoom extends React.Component {
+  constructor(props) {
+    super(props);
+    this.aceEditor = React.createRef();
+    this.params = this.props.params;
+    this.room = this.props.room;
+  }
+
+  componentDidMount() {
+    const code = `var rows = prompt("How many rows for your multiplication table?");
+var cols = prompt("How many columns for your multiplication table?");
+if (rows == "" || rows == null)
+   \t rows = 10;
+if (cols== "" || cols== null)
+   \t cols = 10;
+createTable(rows, cols);
+function createTable(rows, cols) {
+  var j=1;
+  var output = "<table border='1' width='500' cellspacing='0'cellpadding='5'>";
+  for(i=1;i<=rows;i++) {
+\toutput = output + "<tr>";
+    while(j<=cols) {
+  \t  output = output + "<td>" + i*j + "</td>";
+   \t  j = j+1;
+   \t}
+   \t output = output + "</tr>";
+   \t j = 1;
+}
+output = output + "</table>";
+console.log(output);
+`;
+    this.aceEditor.current.editor.insert(code);
+    // TODO Move the code to server, and push state whenever it is sent
+    this.aceEditor.current.editor.selectAll();
+    this.aceEditor.current.editor.insert('console.log("hi");');
+  }
+
+  handleRunCode = () => {
     const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
     sandboxedEval(editorTextEl);
-  }
-  function handleSubmitCode() {
+  };
+
+  handleSubmitCode = () => {
     const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
     // TODO Submit the code to the backend and provide it to the instructor
     console.log(editorTextEl.innerText);
-  }
+  };
 
-  return (
-    <div className="classroom row no-gutters">
-      <Style>
-        {`
+  render() {
+    return (
+      <div className="classroom row no-gutters">
+        <Style>
+          {`
         .amplify-app > footer a,
           .amplify-app > footer a,
           .amplify-app > footer a:visited,
@@ -177,50 +218,63 @@ function ValidClassroom({ params }) {
           color: #FFEFFF;
         }
       `}
-      </Style>
-      <Helmet>
-        {/* TODO programmatic title */}
-        <title>{`${params.roomId} | Amplify`}</title>
-      </Helmet>
-      <div className="run-code-wrapper position-absolute">
-        <button
-          type="button"
-          id="run-code"
-          className="btn btn-sm btn-outline-light"
-          onClick={handleRunCode}
-        >
-          Run &gt;
-        </button>
-        <small className="text-white font-italic ml-1">
-          Or press ctrl-enter to run
-        </small>
+        </Style>
+        <Helmet>
+          <title>{`${this.room.name} | Amplify`}</title>
+        </Helmet>
+        <div className="run-code-wrapper position-absolute">
+          <button
+            type="button"
+            id="run-code"
+            className="btn btn-sm btn-outline-light"
+            onClick={this.handleRunCode}
+          >
+            Run &gt;
+          </button>
+          <small className="text-white font-italic ml-1">
+            Or press ctrl-enter to run
+          </small>
+        </div>
+        {ROLE_STUDENT === this.params.role && (
+          <button
+            type="button"
+            id="submit-code"
+            className="btn btn-sm btn-outline-light position-absolute"
+            onMouseUp={this.handleSubmitCode}
+          >
+            Submit
+          </button>
+        )}
+        <AceEditor
+          mode="javascript"
+          theme="monokai"
+          name="amplify-code-editor"
+          placeholder='console.log("hello world!");'
+          width="auto"
+          // value=""
+          className="col-8"
+          ref={this.aceEditor}
+          editorProps={{ $blockScrolling: true }}
+        />
+        <pre id="console" className="col-4 pl-1">
+          &raquo;{' '}
+        </pre>
       </div>
-      <button
-        type="button"
-        id="submit-code"
-        className="btn btn-sm btn-outline-light position-absolute"
-        onMouseUp={handleSubmitCode}
-      >
-        Submit
-      </button>
-      <AceEditor
-        mode="javascript"
-        theme="monokai"
-        name="amplify-code-editor"
-        placeholder='console.log("hello world!");'
-        width="auto"
-        // value=""
-        className="col-8"
-        editorProps={{ $blockScrolling: true }}
-      />
-      <pre id="console" className="col-4 pl-1">
-        &raquo;{' '}
-      </pre>
-    </div>
-  );
+    );
+  }
 }
 
-function Classroom() {
+function Classroom({ location }) {
+  let room = {};
+  if (location.state && 'room' in location.state) {
+    // TODO don't pass room via React Router, as the `state` will only be
+    //  available if a user clicks on the link. direct access to a page
+    //  will result in the `state` not being accessible.
+    //  use roomId to grab the room details from the server and access the
+    //  data that way
+    room = location.state.room;
+  }
+  // const [room, setRoom] = useState(room)
   // Grab the params from the Route
   const params = useParams();
   // const [isValid, setIsValid] = useState(false);
@@ -238,7 +292,7 @@ function Classroom() {
         name: 'Javascript 201',
       },
     ];
-    const validRoles = ['student', 'instructor'];
+    const validRoles = [ROLE_STUDENT, ROLE_INSTRUCTOR];
     let stateOfValidity = false;
     for (let i = 0; i < validRooms.length; i += 1) {
       if (params.roomId === validRooms[i].roomId) {
@@ -273,7 +327,7 @@ function Classroom() {
     // First check the roomId is valid
     <>
       {isValid.current ? (
-        <ValidClassroom params={params} />
+        <ValidRoom room={room} params={params} />
       ) : (
         <Redirect
           to={{
