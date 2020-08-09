@@ -29,6 +29,8 @@ function Main() {
         </div>
         <div className="content">
           <Route exact path="/" component={Lobby} />
+          {/* catch routing to base path as well */}
+          <Route path="/room" component={Classroom} />
           <Route path="/room/:roomId" component={Classroom} />
         </div>
         <footer>

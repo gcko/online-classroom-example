@@ -78,8 +78,7 @@ function Lobby() {
       parentEl.classList.add('was-validated');
       changed.current[e.target.id] = true;
     }
-    // TODO send the entered potentially valid room ID to the server
-    //  and get null or a room Object in response
+    // TODO move to server
     const validRooms = [
       {
         roomId: '11111111',
@@ -98,6 +97,8 @@ function Lobby() {
     if (e.target.id === 'room-id' && !e.target.validity.patternMismatch) {
       const maybeRoomId = e.target.value;
       let validRoomFound = false;
+      // TODO send the entered potentially valid room ID to the server
+      //  and get null or a room Object in response
       for (let i = 0; i < validRooms.length; i += 1) {
         if (maybeRoomId === validRooms[i].roomId) {
           validRoomFound = true;

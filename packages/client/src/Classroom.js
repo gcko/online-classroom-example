@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import Redirect from 'react-router-dom/es/Redirect';
 import { Helmet } from 'react-helmet';
 import { Style } from 'react-style-tag';
 import AceEditor from 'react-ace';
@@ -153,28 +154,7 @@ function handleKeyboardShortcuts(on = true) {
   }
 }
 
-function Classroom() {
-  // Grab the params from the Route
-  const params = useParams();
-
-  useEffect(() => {
-    const defaultLog = console.log;
-    const defaultWarn = console.warn;
-    const defaultError = console.error;
-    const defaultClear = console.clear;
-    handleKeyboardShortcuts(true);
-    // Override console *after* sandboxing eval
-    overrideConsole(document.getElementById('console'));
-    return function cleanup() {
-      // remove override
-      console.log = defaultLog;
-      console.warn = defaultWarn;
-      console.error = defaultError;
-      console.clear = defaultClear;
-      handleKeyboardShortcuts(false);
-    };
-  });
-
+function ValidClassroom({ params }) {
   return (
     <div className="classroom row">
       <Style>
@@ -206,6 +186,74 @@ function Classroom() {
         &raquo;{' '}
       </pre>
     </div>
+  );
+}
+
+function Classroom() {
+  const [isValid, setIsValid] = useState(false);
+
+  // Grab the params from the Route
+  const params = useParams();
+
+  function roomIdIsValid() {
+    // TODO pull from server (same as Lobby.js)
+    const validRooms = [
+      {
+        roomId: '11111111',
+        name: 'Javascript 101',
+      },
+      {
+        roomId: 'ABCDEFGH',
+        name: 'Javascript 201',
+      },
+    ];
+    for (let i = 0; i < validRooms.length; i += 1) {
+      if (params.roomId === validRooms[i].roomId) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  useEffect(() => {
+    setIsValid(roomIdIsValid());
+    return function cleanup() {
+      // cleanup changes after navigating away
+      setIsValid(false);
+    };
+  });
+
+  useEffect(() => {
+    const defaultLog = console.log;
+    const defaultWarn = console.warn;
+    const defaultError = console.error;
+    const defaultClear = console.clear;
+    handleKeyboardShortcuts(true);
+    // Override console *after* sandboxing eval
+    overrideConsole(document.getElementById('console'));
+    return function cleanup() {
+      // remove override
+      console.log = defaultLog;
+      console.warn = defaultWarn;
+      console.error = defaultError;
+      console.clear = defaultClear;
+      handleKeyboardShortcuts(false);
+    };
+  });
+
+  return (
+    // First check the roomId is valid
+    <>
+      {isValid ? (
+        <ValidClassroom params={params} />
+      ) : (
+        <Redirect
+          to={{
+            pathname: '/',
+          }}
+        />
+      )}
+    </>
   );
 }
 
