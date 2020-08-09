@@ -26,12 +26,12 @@ function DisabledCardContents() {
   );
 }
 
-function EnabledCardContents() {
+function EnabledCardContents({ roomId }) {
   return (
     <div className="card-body row align-items-center">
       <p className="card-text col-10 mb-0">Javascript 101</p>
       <Link
-        to="/room"
+        to={`/room/${roomId}`}
         role="button"
         className="btn btn-outline-secondary col-2"
       >
@@ -41,16 +41,21 @@ function EnabledCardContents() {
   );
 }
 
-function RoomCard({ isValid }) {
+function RoomCard({ isValid, roomId }) {
   return (
     <div className="card mt-3">
-      {isValid ? <EnabledCardContents /> : <DisabledCardContents />}
+      {isValid ? (
+        <EnabledCardContents roomId={roomId} />
+      ) : (
+        <DisabledCardContents />
+      )}
     </div>
   );
 }
 
 function Lobby() {
   const [isValid, setIsValid] = useState(false);
+  const [roomId, setRoomId] = useState(null);
   // Store the state of changes
   const changed = useRef({});
   useEffect(() => {
@@ -69,9 +74,6 @@ function Lobby() {
     } else {
       roleSelectEl.setCustomValidity('');
     }
-    if (e.target.id === 'role-select') {
-      // validate that
-    }
     if (
       !(e.target.id in changed.current) &&
       parentEl.classList.contains('form-group')
@@ -79,6 +81,39 @@ function Lobby() {
       // Add validation UI state after initial change only
       parentEl.classList.add('was-validated');
       changed.current[e.target.id] = true;
+    }
+    // TODO send the entered potentially valid room ID to the server
+    //  and get null or a room Object in response
+    const validRooms = [
+      {
+        roomId: '11111111',
+      },
+      {
+        roomId: 'ABCDEFGH',
+      },
+    ];
+    // Specifically check if the roomId is a valid roomId
+    if (e.target.id === 'room-id' && !e.target.validity.patternMismatch) {
+      const maybeRoomId = e.target.value;
+      let validRoomFound = false;
+      for (let i = 0; i < validRooms.length; i += 1) {
+        if (maybeRoomId === validRooms[i].roomId) {
+          validRoomFound = true;
+          // remove validation message if it existed
+          e.target.setCustomValidity('');
+          document.getElementById('not-real-room-id').classList.add('d-none');
+        }
+      }
+      if (!validRoomFound) {
+        // add validation message when room is not valid
+        e.target.setCustomValidity('This room has not been created yet.');
+        document.getElementById('not-real-room-id').classList.remove('d-none');
+      }
+    }
+    // Remove "not real room ID" tooltip even if the validation fails
+    if (e.target.id === 'room-id' && e.target.validity.patternMismatch) {
+      e.target.setCustomValidity('');
+      document.getElementById('not-real-room-id').classList.add('d-none');
     }
     // Connect state validity to the form's validity
     setIsValid(e.target.form.checkValidity());
@@ -111,7 +146,7 @@ function Lobby() {
           </select>
         </div>
         {/* TODO: customize validation feedback to fit */}
-        <div className="form-group">
+        <div className="form-group position-relative">
           <input
             type="text"
             className="form-control"
@@ -120,7 +155,14 @@ function Lobby() {
             pattern="[0-9a-zA-Z]{8}"
             maxLength="8"
             required
+            onChange={function(e) {
+              setRoomId(e.target.value);
+            }}
           />
+          <div id="not-real-room-id" className="invalid-tooltip d-none">
+            This room ID has not been created yet
+          </div>
+          <div className="valid-tooltip">Correct!</div>
           <div className="conditional-feedback">
             <ExclamationCircle /> Must be 8 characters in length
           </div>
@@ -128,7 +170,7 @@ function Lobby() {
             <ExclamationCircle /> May only contain alphanumeric characters
           </div>
         </div>
-        <RoomCard isValid={isValid} />
+        <RoomCard isValid={isValid} roomId={roomId} />
       </form>
     </div>
   );

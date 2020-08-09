@@ -29,7 +29,7 @@ function Main() {
         </div>
         <div className="content">
           <Route exact path="/" component={Lobby} />
-          <Route path="/room" component={Classroom} />
+          <Route path="/room/:roomId" component={Classroom} />
         </div>
         <footer>
           <a href="#terms-of-service">Terms of Service</a>

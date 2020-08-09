@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import React, { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Style } from 'react-style-tag';
 import AceEditor from 'react-ace';
@@ -153,6 +154,9 @@ function handleKeyboardShortcuts(on = true) {
 }
 
 function Classroom() {
+  // Grab the params from the Route
+  const params = useParams();
+
   useEffect(() => {
     const defaultLog = console.log;
     const defaultWarn = console.warn;
@@ -187,7 +191,7 @@ function Classroom() {
       </Style>
       <Helmet>
         {/* TODO programmatic title */}
-        <title>JS 101 | Amplify</title>
+        <title>{`${params.roomId} | Amplify`}</title>
       </Helmet>
       <AceEditor
         mode="javascript"
