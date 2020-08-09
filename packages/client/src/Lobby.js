@@ -6,6 +6,7 @@ import {
   ExclamationCircle,
   ChevronBarRight,
 } from 'react-bootstrap-icons';
+import pluralize from 'pluralize';
 import './Lobby.sass';
 
 function DisabledCardContents() {
@@ -27,17 +28,81 @@ function DisabledCardContents() {
 }
 
 function EnabledCardContents({ room, role }) {
+  function getRoomAttendance() {
+    // TODO get this from the server
+    return [
+      {
+        name: 'instructor',
+        label: 'Instructor',
+        amount: 0,
+      },
+      {
+        name: 'student',
+        label: 'Student',
+        amount: 1,
+      },
+    ];
+  }
+
+  function isRoleFull(attendee = role) {
+    const attendance = getRoomAttendance();
+    for (let i = 0; i < attendance.length; i += 1) {
+      if (attendance[i].name === attendee) {
+        return attendance[i].amount > 0;
+      }
+    }
+    // the role wasn't found!
+    return -1;
+  }
+
+  function isClassFull() {
+    return isRoleFull('student') && isRoleFull('instructor');
+  }
+
   return (
     <div className="card-body row align-items-center">
-      <p className="card-text col-10 mb-0">{room.name}</p>
-      <Link
-        to={`/room/${room.roomId}/${role}`}
-        role="button"
-        className="btn btn-outline-secondary col-2"
-        title="Go to class!"
-      >
-        <ChevronBarRight />
-      </Link>
+      <div className="card-text col-10 mb-0">
+        <p>{room.name}</p>
+        {getRoomAttendance().map(attendee => {
+          return (
+            <small key={attendee.name} className="d-block">
+              {attendee.amount} {pluralize(attendee.label, attendee.amount)}
+            </small>
+          );
+        })}
+      </div>
+      {/* TODO refactor this - only minor changes occur to the code */}
+      {/* eslint-disable-next-line no-nested-ternary */}
+      {isClassFull() ? (
+        <Link
+          to="/"
+          role="button"
+          aria-disabled="true"
+          className="btn btn-outline-secondary disabled col-2"
+          title="class is full!"
+        >
+          <XCircleFill />
+        </Link>
+      ) : isRoleFull() ? (
+        <Link
+          to="/"
+          role="button"
+          aria-disabled="true"
+          className="btn btn-outline-secondary disabled col-2"
+          title="class is full!"
+        >
+          <XCircleFill />
+        </Link>
+      ) : (
+        <Link
+          to={`/room/${room.roomId}/${role}`}
+          role="button"
+          className="btn btn-outline-secondary col-2"
+          title="Go to class!"
+        >
+          <ChevronBarRight />
+        </Link>
+      )}
     </div>
   );
 }
