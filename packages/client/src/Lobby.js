@@ -155,7 +155,7 @@ function Lobby() {
             pattern="[0-9a-zA-Z]{8}"
             maxLength="8"
             required
-            onChange={function(e) {
+            onChange={function handleChange(e) {
               setRoomId(e.target.value);
             }}
           />
