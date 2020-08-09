@@ -26,14 +26,15 @@ function DisabledCardContents() {
   );
 }
 
-function EnabledCardContents({ room }) {
+function EnabledCardContents({ room, role }) {
   return (
     <div className="card-body row align-items-center">
       <p className="card-text col-10 mb-0">{room.name}</p>
       <Link
-        to={`/room/${room.roomId}`}
+        to={`/room/${room.roomId}/${role}`}
         role="button"
         className="btn btn-outline-secondary col-2"
+        title="Go to class!"
       >
         <ChevronBarRight />
       </Link>
@@ -41,10 +42,14 @@ function EnabledCardContents({ room }) {
   );
 }
 
-function RoomCard({ isValid, room }) {
+function RoomCard({ isValid, room, role }) {
   return (
     <div className="card mt-3">
-      {isValid ? <EnabledCardContents room={room} /> : <DisabledCardContents />}
+      {isValid ? (
+        <EnabledCardContents room={room} role={role} />
+      ) : (
+        <DisabledCardContents />
+      )}
     </div>
   );
 }
@@ -52,6 +57,7 @@ function RoomCard({ isValid, room }) {
 function Lobby() {
   const [isValid, setIsValid] = useState(false);
   const [room, setRoom] = useState(null);
+  const [role, setRole] = useState(null);
   // Store the state of changes
   const changed = useRef({});
   useEffect(() => {
@@ -59,7 +65,7 @@ function Lobby() {
       // cleanup changes after navigating away
       changed.current = {};
     };
-  });
+  }, []);
 
   function formValidator(e) {
     const parentEl = e.target.parentElement;
@@ -69,6 +75,8 @@ function Lobby() {
       roleSelectEl.setCustomValidity('You must select a role');
     } else {
       roleSelectEl.setCustomValidity('');
+      // set role state
+      setRole(roleSelectEl.value);
     }
     if (
       !(e.target.id in changed.current) &&
@@ -171,7 +179,7 @@ function Lobby() {
             <ExclamationCircle /> May only contain alphanumeric characters
           </div>
         </div>
-        <RoomCard isValid={isValid} room={room} />
+        <RoomCard isValid={isValid} room={room} role={role} />
       </form>
     </div>
   );

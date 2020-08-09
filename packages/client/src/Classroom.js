@@ -154,8 +154,18 @@ function handleKeyboardShortcuts(on = true) {
 }
 
 function ValidClassroom({ params }) {
+  function handleRunCode() {
+    const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
+    sandboxedEval(editorTextEl);
+  }
+  function handleSubmitCode() {
+    const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
+    // TODO Submit the code to the backend and provide it to the instructor
+    console.log(editorTextEl.innerText);
+  }
+
   return (
-    <div className="classroom row">
+    <div className="classroom row no-gutters">
       <Style>
         {`
         .amplify-app > footer a,
@@ -172,16 +182,38 @@ function ValidClassroom({ params }) {
         {/* TODO programmatic title */}
         <title>{`${params.roomId} | Amplify`}</title>
       </Helmet>
+      <div className="run-code-wrapper position-absolute">
+        <button
+          type="button"
+          id="run-code"
+          className="btn btn-sm btn-outline-light"
+          onClick={handleRunCode}
+        >
+          Run &gt;
+        </button>
+        <small className="text-white font-italic ml-1">
+          Or press ctrl-enter to run
+        </small>
+      </div>
+      <button
+        type="button"
+        id="submit-code"
+        className="btn btn-sm btn-outline-light position-absolute"
+        onMouseUp={handleSubmitCode}
+      >
+        Submit
+      </button>
       <AceEditor
         mode="javascript"
         theme="monokai"
         name="amplify-code-editor"
         placeholder='console.log("hello world!");'
+        width="auto"
         // value=""
         className="col-8"
         editorProps={{ $blockScrolling: true }}
       />
-      <pre id="console" className="col-4">
+      <pre id="console" className="col-4 pl-1">
         &raquo;{' '}
       </pre>
     </div>
@@ -189,10 +221,10 @@ function ValidClassroom({ params }) {
 }
 
 function Classroom() {
-  // const [isValid, setIsValid] = useState(false);
-  const isValid = useRef(false);
   // Grab the params from the Route
   const params = useParams();
+  // const [isValid, setIsValid] = useState(false);
+  const isValid = useRef(false);
 
   function roomIdIsValid() {
     // TODO pull from server (same as Lobby.js)
@@ -206,12 +238,15 @@ function Classroom() {
         name: 'Javascript 201',
       },
     ];
+    const validRoles = ['student', 'instructor'];
+    let stateOfValidity = false;
     for (let i = 0; i < validRooms.length; i += 1) {
       if (params.roomId === validRooms[i].roomId) {
-        return true;
+        stateOfValidity = validRoles.indexOf(params.role) >= 0;
       }
     }
-    return false;
+    // return true;
+    return stateOfValidity;
   }
   // Set the referenced state for isValid
   isValid.current = roomIdIsValid();

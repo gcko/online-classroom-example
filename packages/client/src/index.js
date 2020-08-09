@@ -9,31 +9,20 @@ import Classroom from './Classroom';
 function Main() {
   return (
     <Router>
-      <div className="amplify-app container-fluid">
-        <div className="top-page-content row">
+      <div className="amplify-app">
+        <div className="top-page-content">
           <h2 className="col-3">
-            <Link to="/">
+            <Link to="/" title="Back to the Lobby">
               Amplify <small>your skill</small>
             </Link>
           </h2>
-          <ul className="nav col-9">
-            <li className="nav-item">
-              <Link to="/" className="nav-link">
-                Lobby
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/room" className="nav-link">
-                Class
-              </Link>
-            </li>
-          </ul>
         </div>
         <div className="content">
           <Route exact path="/" component={Lobby} />
           {/* catch routing to base path as well */}
           <Route exact path="/room" component={Classroom} />
-          <Route path="/room/:roomId" component={Classroom} />
+          <Route exact path="/room/:roomId" component={Classroom} />
+          <Route exact path="/room/:roomId/:role" component={Classroom} />
         </div>
         <footer>
           <a href="#terms-of-service">Terms of Service</a>
