@@ -39,7 +39,7 @@ function EnabledCardContents({ room, role }) {
       {
         name: 'student',
         label: 'Student',
-        amount: 1,
+        amount: 0,
       },
     ];
   }
@@ -115,7 +115,7 @@ function EnabledCardContents({ room, role }) {
         </>
       ) : (
         <Link
-          to={`/room/${room.roomId}/${role}`}
+          to={`/room/${room.id}/${role}`}
           role="button"
           className="btn btn-outline-secondary col-2"
           title="Go to class!"
@@ -145,6 +145,7 @@ function Lobby() {
   const [role, setRole] = useState(null);
   // Store the state of changes
   const changed = useRef({});
+  // const room = useRef(null);
   useEffect(() => {
     return function cleanup() {
       // cleanup changes after navigating away
@@ -152,7 +153,7 @@ function Lobby() {
     };
   }, []);
 
-  function formValidator(e) {
+  async function formValidator(e) {
     const targetEl = e.target;
     const parentEl = targetEl.parentElement;
     const roleSelectEl = document.getElementById('role-select');
@@ -179,25 +180,19 @@ function Lobby() {
     // Specifically check if the roomId is a potentially valid roomId
     if (targetEl.id === 'room-id' && !targetEl.validity.patternMismatch) {
       const maybeRoomId = targetEl.value;
-      // can refactor this to use await
-      fetch(`/api/rooms/${maybeRoomId}`)
-        .then(resp => resp.json())
-        .then(res => {
-          if ('id' in res) {
-            // the room exists
-            // validRoomFound = true;
-            setRoom(res.id);
-            // remove validation message if it existed
-            targetEl.setCustomValidity('');
-            document.getElementById('not-real-room-id').classList.add('d-none');
-          } else {
-            // add validation message when room is not valid
-            targetEl.setCustomValidity('This room has not been created yet.');
-            document
-              .getElementById('not-real-room-id')
-              .classList.remove('d-none');
-          }
-        });
+      const response = await fetch(`/api/rooms/${maybeRoomId}`);
+      const data = await response.json();
+      if ('id' in data) {
+        // the room exists
+        setRoom(data);
+        // remove validation message if it existed
+        targetEl.setCustomValidity('');
+        document.getElementById('not-real-room-id').classList.add('d-none');
+      } else {
+        // add validation message when room is not valid
+        targetEl.setCustomValidity('This room has not been created yet.');
+        document.getElementById('not-real-room-id').classList.remove('d-none');
+      }
     }
     // Remove "not real room ID" tooltip even if the validation fails
     if (targetEl.id === 'room-id' && targetEl.validity.patternMismatch) {
@@ -221,7 +216,11 @@ function Lobby() {
         Below please select your role and enter the room identifier provided to
         you.
       </p>
-      <form className="col-4" onChange={formValidator}>
+      <form
+        className="col-4"
+        onChange={formValidator}
+        onSubmit={e => e.preventDefault()}
+      >
         <div className="form-group">
           <select
             className="form-control"
