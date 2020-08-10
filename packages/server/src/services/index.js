@@ -39,7 +39,7 @@ function submissionService() {
         text: submission,
       };
       // create or update the room's submissionId
-      room['submissionId'] = submissionId;
+      room.submissionId = submissionId;
       return submissionId;
     }
     return false;

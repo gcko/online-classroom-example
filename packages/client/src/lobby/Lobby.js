@@ -8,6 +8,7 @@ import {
 } from 'react-bootstrap-icons';
 import pluralize from 'pluralize';
 import './Lobby.sass';
+import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
 
 function DisabledCardContents() {
   return (
@@ -29,19 +30,8 @@ function DisabledCardContents() {
 
 function EnabledCardContents({ room, role }) {
   function getRoomAttendance() {
-    // TODO get this from the server or websockets
-    return [
-      {
-        name: 'instructor',
-        label: 'Instructor',
-        amount: 0,
-      },
-      {
-        name: 'student',
-        label: 'Student',
-        amount: 0,
-      },
-    ];
+    // TODO update with web sockets
+    return room.attendance;
   }
 
   function Tooltip(props) {
@@ -65,7 +55,7 @@ function EnabledCardContents({ room, role }) {
   }
 
   function isClassFull() {
-    return isRoleFull('student') && isRoleFull('instructor');
+    return isRoleFull(ROLE_STUDENT) && isRoleFull(ROLE_INSTRUCTOR);
   }
 
   return (
@@ -140,12 +130,11 @@ function RoomCard({ isValid, room, role }) {
 }
 
 function Lobby() {
+  // Store the state of changes
   const [isValid, setIsValid] = useState(false);
   const [room, setRoom] = useState(null);
   const [role, setRole] = useState(null);
-  // Store the state of changes
   const changed = useRef({});
-  // const room = useRef(null);
   useEffect(() => {
     return function cleanup() {
       // cleanup changes after navigating away
@@ -158,7 +147,7 @@ function Lobby() {
     const parentEl = targetEl.parentElement;
     const roleSelectEl = document.getElementById('role-select');
     // Default value is invalid
-    if (['student', 'instructor'].indexOf(roleSelectEl.value) < 0) {
+    if ([ROLE_STUDENT, ROLE_INSTRUCTOR].indexOf(roleSelectEl.value) < 0) {
       roleSelectEl.setCustomValidity('You must select a role');
     } else {
       roleSelectEl.setCustomValidity('');
@@ -209,10 +198,10 @@ function Lobby() {
         <title>Lobby | Amplify</title>
         <link rel="canonical" href="https://amplifyourskill.com/" />
       </Helmet>
-      <p className="pt-3">
+      <p className="pt-3 pl-3">
         Welcome to Amplify, were we endeavor to amplify your skill!
       </p>
-      <p>
+      <p className="pl-3">
         Below please select your role and enter the room identifier provided to
         you.
       </p>
@@ -229,8 +218,8 @@ function Lobby() {
             required
           >
             <option disabled>Select a role...</option>
-            <option value="student">Student</option>
-            <option value="instructor">Instructor</option>
+            <option value={ROLE_STUDENT}>Student</option>
+            <option value={ROLE_INSTRUCTOR}>Instructor</option>
           </select>
         </div>
         <div className="form-group position-relative">

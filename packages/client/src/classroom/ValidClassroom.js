@@ -7,9 +7,7 @@ import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
 import Modal from '../common/Modal';
-
-const ROLE_INSTRUCTOR = 'instructor';
-const ROLE_STUDENT = 'student';
+import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
 
 // Custom Dev Console output
 // https://github.com/iambenkay/js-ide/blob/master/index.html
