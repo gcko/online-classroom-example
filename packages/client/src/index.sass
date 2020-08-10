@@ -21,6 +21,7 @@ $font-size-base: 1.1rem
 @import "../../node_modules/bootstrap/scss/_nav.scss"
 @import "../../node_modules/bootstrap/scss/_navbar.scss"
 @import "../../node_modules/bootstrap/scss/_card.scss"
+@import "../../node_modules/bootstrap/scss/_tooltip.scss"
 
 // Put Bootstrap additions here
 .conditional-feedback
@@ -39,9 +40,18 @@ $font-size-base: 1.1rem
   width: 5rem
   max-width: 5rem
 
+.tooltip
+  width: 17rem
+  left: 100%
+  .arrow
+    top: 40%
+  .tooltip-inner
+    max-width: none
+
 // Put global styles and resets here
 body
   margin: 0
+  min-width: 1080px // Set minimum sizing for the UI *NOT mobile friendly*
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale

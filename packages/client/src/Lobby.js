@@ -44,6 +44,21 @@ function EnabledCardContents({ room, role }) {
     ];
   }
 
+  function Tooltip(props) {
+    return (
+      <div
+        className="tooltip fade bs-tooltip-right show"
+        role="tooltip"
+        id="tooltip452870"
+        // style="transform: translate3d(572px, 1674px, 0px); top: 0px; left: 0px; will-change: transform;"
+        x-placement="right"
+      >
+        <div className="arrow" />
+        <div className="tooltip-inner">{props.children}</div>
+      </div>
+    );
+  }
+
   function isRoleFull(attendee = role) {
     const attendance = getRoomAttendance();
     for (let i = 0; i < attendance.length; i += 1) {
@@ -74,25 +89,36 @@ function EnabledCardContents({ room, role }) {
       {/* TODO refactor this - only minor changes occur to the code */}
       {/* eslint-disable-next-line no-nested-ternary */}
       {isClassFull() ? (
-        <Link
-          to="/"
-          role="button"
-          aria-disabled="true"
-          className="btn btn-outline-secondary disabled col-2"
-          title="class is full!"
-        >
-          <XCircleFill />
-        </Link>
+        <>
+          <Link
+            to="/"
+            role="button"
+            aria-disabled="true"
+            className="btn btn-outline-secondary disabled col-2"
+            title="class is full!"
+          >
+            <XCircleFill />
+          </Link>
+          <Tooltip>
+            The class is full! Please wait for space to become available.
+          </Tooltip>
+        </>
       ) : isRoleFull() ? (
-        <Link
-          to="/"
-          role="button"
-          aria-disabled="true"
-          className="btn btn-outline-secondary disabled col-2"
-          title="class is full!"
-        >
-          <XCircleFill />
-        </Link>
+        <>
+          <Link
+            to="/"
+            role="button"
+            aria-disabled="true"
+            className="btn btn-outline-secondary disabled col-2"
+            title="class is full!"
+          >
+            <XCircleFill />
+          </Link>
+          <Tooltip>
+            There is already one {role} in the class, please wait for space to
+            become available.
+          </Tooltip>
+        </>
       ) : (
         <Link
           to={`/room/${room.roomId}/${role}`}
