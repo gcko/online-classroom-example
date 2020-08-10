@@ -29,7 +29,7 @@ function DisabledCardContents() {
 
 function EnabledCardContents({ room, role }) {
   function getRoomAttendance() {
-    // TODO get this from the server
+    // TODO get this from the server or websockets
     return [
       {
         name: 'instructor',
@@ -244,7 +244,7 @@ function Lobby() {
             required
           />
           <div id="not-real-room-id" className="invalid-tooltip d-none">
-            This room ID has not been created yet
+            This room has not been created yet
           </div>
           <div className="valid-tooltip">Correct!</div>
           <div className="conditional-feedback">

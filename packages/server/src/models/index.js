@@ -13,7 +13,7 @@ let rooms = {
 let submissions = {
   1: {
     id: '1',
-    text: 'console.log("I am submitted code")',
+    text: 'console.log("I am submitted code yo")',
     roomId: '11111111',
   },
 };

@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Link, Route } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 import './index.sass';
 import * as serviceWorker from './serviceWorker';
-import Lobby from './Lobby';
-import Classroom from './Classroom';
+import Lobby from './lobby/Lobby';
+import Classroom from './classroom/Classroom';
 
 function Main() {
   return (

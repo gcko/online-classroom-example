@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
-import React, { useEffect, useRef } from 'react';
-import { Redirect, useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Style } from 'react-style-tag';
+import { Helmet } from 'react-helmet';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
-import './Classroom.sass';
+import Modal from '../common/Modal';
 
 const ROLE_INSTRUCTOR = 'instructor';
 const ROLE_STUDENT = 'student';
@@ -156,41 +156,51 @@ function handleKeyboardShortcuts(on = true) {
   }
 }
 
+async function getSubmission(roomId) {
+  const response = await fetch(`/api/rooms/${roomId}/submission`);
+  const submission = await response.json();
+  return submission;
+}
+
 class ValidRoom extends React.Component {
   constructor(props) {
     super(props);
     this.aceEditor = React.createRef();
     this.params = this.props.params;
     this.room = this.props.room;
+    this.state = {
+      hasSubmission: false,
+    };
+    this.defaultLog = console.log;
+    this.defaultWarn = console.warn;
+    this.defaultError = console.error;
+    this.defaultClear = console.clear;
   }
 
-  componentDidMount() {
-    const code = `var rows = prompt("How many rows for your multiplication table?");
-var cols = prompt("How many columns for your multiplication table?");
-if (rows == "" || rows == null)
-   \t rows = 10;
-if (cols== "" || cols== null)
-   \t cols = 10;
-createTable(rows, cols);
-function createTable(rows, cols) {
-  var j=1;
-  var output = "<table border='1' width='500' cellspacing='0'cellpadding='5'>";
-  for(i=1;i<=rows;i++) {
-\toutput = output + "<tr>";
-    while(j<=cols) {
-  \t  output = output + "<td>" + i*j + "</td>";
-   \t  j = j+1;
-   \t}
-   \t output = output + "</tr>";
-   \t j = 1;
-}
-output = output + "</table>";
-console.log(output);
-`;
-    this.aceEditor.current.editor.insert(code);
-    // TODO Move the code to server, and push state whenever it is sent
-    this.aceEditor.current.editor.selectAll();
-    this.aceEditor.current.editor.insert('console.log("hi");');
+  async componentDidMount() {
+    if (this.params.role === ROLE_INSTRUCTOR) {
+      if (this.room.submissionId) {
+        // Show the submitted code
+        const submission = await getSubmission(this.room.id);
+        this.setState({ hasSubmission: true });
+        this.aceEditor.current.editor.insert(submission.text);
+      } else {
+        // no code has been submitted yet, show a notification
+        this.setState({ hasSubmission: false });
+      }
+    }
+    handleKeyboardShortcuts(true);
+    // Override console *after* sandboxing eval
+    overrideConsole(document.getElementById('console'));
+  }
+
+  componentWillUnmount() {
+    // remove override
+    console.log = this.defaultLog;
+    console.warn = this.defaultWarn;
+    console.error = this.defaultError;
+    console.clear = this.defaultClear;
+    handleKeyboardShortcuts(false);
   }
 
   handleRunCode = () => {
@@ -198,10 +208,23 @@ console.log(output);
     sandboxedEval(editorTextEl);
   };
 
-  handleSubmitCode = () => {
-    const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
-    // TODO Submit the code to the backend and provide it to the instructor
-    console.log(editorTextEl.innerText);
+  handleSubmitCode = async () => {
+    const body = {
+      roomId: this.room.id,
+      submission: document.getElementsByClassName('ace_text-layer')[0]
+        .innerText,
+    };
+    // TODO change text to "Submitting..."
+    const response = await fetch(`/api/submissions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    const responseJson = await response.json();
+    // TODO change text to "Submitted!"
+    console.log(responseJson);
   };
 
   render() {
@@ -259,84 +282,17 @@ console.log(output);
         <pre id="console" className="col-4 pl-1">
           &raquo;{' '}
         </pre>
+        {!this.state.hasSubmission && ROLE_INSTRUCTOR === this.params.role && (
+          <Modal title="Wait for submission">
+            <p>No submission has been made yet. Please wait...</p>
+            <p>
+              Go back to the <Link to="/">Lobby</Link>.
+            </p>
+          </Modal>
+        )}
       </div>
     );
   }
 }
 
-function Classroom({ location }) {
-  let room = {};
-  if (location.state && 'room' in location.state) {
-    // TODO don't pass room via React Router, as the `state` will only be
-    //  available if a user clicks on the link. direct access to a page
-    //  will result in the `state` not being accessible.
-    //  use roomId to grab the room details from the server and access the
-    //  data that way
-    room = location.state.room;
-  }
-  // const [room, setRoom] = useState(room)
-  // Grab the params from the Route
-  const params = useParams();
-  // const [isValid, setIsValid] = useState(false);
-  const isValid = useRef(false);
-
-  function roomIdIsValid() {
-    // TODO pull from server (same as Lobby.js)
-    const validRooms = [
-      {
-        roomId: '11111111',
-        name: 'Javascript 101',
-      },
-      {
-        roomId: 'ABCDEFGH',
-        name: 'Javascript 201',
-      },
-    ];
-    const validRoles = [ROLE_STUDENT, ROLE_INSTRUCTOR];
-    let stateOfValidity = false;
-    for (let i = 0; i < validRooms.length; i += 1) {
-      if (params.roomId === validRooms[i].roomId) {
-        stateOfValidity = validRoles.indexOf(params.role) >= 0;
-      }
-    }
-    return stateOfValidity;
-  }
-  // Set the referenced state for isValid
-  isValid.current = roomIdIsValid();
-
-  useEffect(() => {
-    const defaultLog = console.log;
-    const defaultWarn = console.warn;
-    const defaultError = console.error;
-    const defaultClear = console.clear;
-    handleKeyboardShortcuts(true);
-    // Override console *after* sandboxing eval
-    overrideConsole(document.getElementById('console'));
-    return function cleanup() {
-      // remove override
-      console.log = defaultLog;
-      console.warn = defaultWarn;
-      console.error = defaultError;
-      console.clear = defaultClear;
-      handleKeyboardShortcuts(false);
-      isValid.current = false;
-    };
-  }, []); // empty array means call only once
-
-  return (
-    // First check the roomId is valid
-    <>
-      {isValid.current ? (
-        <ValidRoom room={room} params={params} />
-      ) : (
-        <Redirect
-          to={{
-            pathname: '/',
-          }}
-        />
-      )}
-    </>
-  );
-}
-
-export default Classroom;
+export default ValidRoom;
