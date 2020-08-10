@@ -2,6 +2,7 @@
   "name": "xccelerate-offsite",
   "version": "1.0.0",
   "private": true,
+  "proxy": "http://localhost:3333",
   "scripts": {
     "lint": "lerna run --parallel lint",
     "start": "lerna run --parallel start",

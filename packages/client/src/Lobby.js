@@ -153,7 +153,8 @@ function Lobby() {
   }, []);
 
   function formValidator(e) {
-    const parentEl = e.target.parentElement;
+    const targetEl = e.target;
+    const parentEl = targetEl.parentElement;
     const roleSelectEl = document.getElementById('role-select');
     // Default value is invalid
     if (['student', 'instructor'].indexOf(roleSelectEl.value) < 0) {
@@ -164,56 +165,47 @@ function Lobby() {
       setRole(roleSelectEl.value);
     }
     if (
-      !(e.target.id in changed.current) &&
+      !(targetEl.id in changed.current) &&
       parentEl.classList.contains('form-group')
     ) {
       // Add validation UI state after initial change only
       parentEl.classList.add('was-validated');
-      changed.current[e.target.id] = true;
+      changed.current[targetEl.id] = true;
     }
-    // TODO move to server
-    const validRooms = [
-      {
-        roomId: '11111111',
-        name: 'Javascript 101',
-      },
-      {
-        roomId: 'ABCDEFGH',
-        name: 'Javascript 201',
-      },
-    ];
-    if (e.target.id === 'room-id') {
+    if (targetEl.id === 'room-id') {
       // Always unset the room to ensure valid state of form
       setRoom(null);
     }
-    // Specifically check if the roomId is a valid roomId
-    if (e.target.id === 'room-id' && !e.target.validity.patternMismatch) {
-      const maybeRoomId = e.target.value;
-      let validRoomFound = false;
-      // TODO send the entered potentially valid room ID to the server
-      //  and get null or a room Object in response
-      for (let i = 0; i < validRooms.length; i += 1) {
-        if (maybeRoomId === validRooms[i].roomId) {
-          validRoomFound = true;
-          setRoom(validRooms[i]);
-          // remove validation message if it existed
-          e.target.setCustomValidity('');
-          document.getElementById('not-real-room-id').classList.add('d-none');
-        }
-      }
-      if (!validRoomFound) {
-        // add validation message when room is not valid
-        e.target.setCustomValidity('This room has not been created yet.');
-        document.getElementById('not-real-room-id').classList.remove('d-none');
-      }
+    // Specifically check if the roomId is a potentially valid roomId
+    if (targetEl.id === 'room-id' && !targetEl.validity.patternMismatch) {
+      const maybeRoomId = targetEl.value;
+      // can refactor this to use await
+      fetch(`/api/rooms/${maybeRoomId}`)
+        .then(resp => resp.json())
+        .then(res => {
+          if ('id' in res) {
+            // the room exists
+            // validRoomFound = true;
+            setRoom(res.id);
+            // remove validation message if it existed
+            targetEl.setCustomValidity('');
+            document.getElementById('not-real-room-id').classList.add('d-none');
+          } else {
+            // add validation message when room is not valid
+            targetEl.setCustomValidity('This room has not been created yet.');
+            document
+              .getElementById('not-real-room-id')
+              .classList.remove('d-none');
+          }
+        });
     }
     // Remove "not real room ID" tooltip even if the validation fails
-    if (e.target.id === 'room-id' && e.target.validity.patternMismatch) {
-      e.target.setCustomValidity('');
+    if (targetEl.id === 'room-id' && targetEl.validity.patternMismatch) {
+      targetEl.setCustomValidity('');
       document.getElementById('not-real-room-id').classList.add('d-none');
     }
     // Connect state validity to the form's validity
-    setIsValid(e.target.form.checkValidity());
+    setIsValid(targetEl.form.checkValidity());
   }
 
   return (
@@ -242,7 +234,6 @@ function Lobby() {
             <option value="instructor">Instructor</option>
           </select>
         </div>
-        {/* TODO: customize validation feedback to fit */}
         <div className="form-group position-relative">
           <input
             type="text"
