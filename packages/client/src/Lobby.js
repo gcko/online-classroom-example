@@ -46,13 +46,7 @@ function EnabledCardContents({ room, role }) {
 
   function Tooltip(props) {
     return (
-      <div
-        className="tooltip fade bs-tooltip-right show"
-        role="tooltip"
-        id="tooltip452870"
-        // style="transform: translate3d(572px, 1674px, 0px); top: 0px; left: 0px; will-change: transform;"
-        x-placement="right"
-      >
+      <div className="tooltip fade bs-tooltip-right show" role="tooltip">
         <div className="arrow" />
         <div className="tooltip-inner">{props.children}</div>
       </div>
