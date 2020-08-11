@@ -42,7 +42,6 @@ class RoomService {
         room.attendance = body.attendance;
       }
       this.trigger('change:attendance', room);
-      // TODO return the updated room
       return room;
     }
     // room didn't exist

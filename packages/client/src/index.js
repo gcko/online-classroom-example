@@ -5,6 +5,7 @@ import './index.sass';
 import * as serviceWorker from './serviceWorker';
 import Lobby from './lobby/Lobby';
 import Classroom from './classroom/Classroom';
+import TermsOfService from './support/TermsOfService';
 
 function Main() {
   // Setup WebSockets
@@ -85,10 +86,11 @@ function Main() {
             path="/room/:roomId/:role"
             render={props => <Classroom {...props} ws={ws} key={ws} />}
           />
+          <Route exact path="/terms-of-service" component={TermsOfService} />
         </div>
         <footer>
-          <a href="#terms-of-service">Terms of Service</a>
-          <a href="#support">Support</a>
+          <Link to="/terms-of-service">Terms of Service</Link>
+          <a href="mailto:jared.scott@variable.team">Contact support</a>
           <span>© 2020 Variable.</span>
         </footer>
       </div>
