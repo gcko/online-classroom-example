@@ -28,10 +28,45 @@ function DisabledCardContents() {
   );
 }
 
-function EnabledCardContents({ room, role }) {
+function EnabledCardContents({ room, role, ws }) {
+  const [theRoom, setTheRoom] = useState(room);
+  const currentWs = useRef(ws);
+
+  function handleWebsocketMessage(e) {
+    console.log(`received on EnabledCardContents: ${e.data}`);
+    const msg = JSON.parse(e.data);
+    if (msg.event === 'change:attendance') {
+      // update room
+      setTheRoom(msg.data);
+      console.log(`EnabledCardContents: updated room`);
+    }
+  }
+
+  useEffect(() => {
+    // use a referenced version of the websocket
+    if (currentWs.current) {
+      // currentWs.current.send('sending from EnabledCardContents :)');
+      currentWs.current.addEventListener('message', handleWebsocketMessage);
+      // currentWs.current.onmessage = e => {};
+    } else {
+      console.log('websocket is not defined');
+    }
+    return function cleanup() {
+      // clean up from previous render
+      if (ws !== currentWs.current) {
+        console.log('Websocket has been updated! Refreshing current websocket');
+        currentWs.current.removeEventListener(
+          'message',
+          handleWebsocketMessage
+        );
+        currentWs.current = ws;
+      }
+    };
+  }); // See if it works if we only call once...
+
   function getRoomAttendance() {
-    // TODO update with web sockets
-    return room.attendance;
+    const ARoom = theRoom || room;
+    return ARoom.attendance;
   }
 
   function Tooltip(props) {
@@ -61,7 +96,7 @@ function EnabledCardContents({ room, role }) {
   return (
     <div className="card-body row align-items-center">
       <div className="card-text col-10 mb-0">
-        <p>{room.name}</p>
+        <p>{(theRoom || room).name}</p>
         {getRoomAttendance().map(attendee => {
           return (
             <small key={attendee.name} className="d-block">
@@ -105,7 +140,7 @@ function EnabledCardContents({ room, role }) {
         </>
       ) : (
         <Link
-          to={`/room/${room.id}/${role}`}
+          to={`/room/${(theRoom || room).id}/${role}`}
           role="button"
           className="btn btn-outline-secondary col-2"
           title="Go to class!"
@@ -117,11 +152,11 @@ function EnabledCardContents({ room, role }) {
   );
 }
 
-function RoomCard({ isValid, room, role }) {
+function RoomCard({ isValid, room, role, ws }) {
   return (
     <div className="card mt-3">
       {isValid ? (
-        <EnabledCardContents room={room} role={role} />
+        <EnabledCardContents room={room} role={role} ws={ws} key={ws} />
       ) : (
         <DisabledCardContents />
       )}
@@ -129,12 +164,38 @@ function RoomCard({ isValid, room, role }) {
   );
 }
 
-function Lobby() {
+function Lobby(props) {
   // Store the state of changes
   const [isValid, setIsValid] = useState(false);
   const [room, setRoom] = useState(null);
   const [role, setRole] = useState(null);
   const changed = useRef({});
+  const currentWs = useRef(props.ws);
+
+  function handleWebsocketMessage(e) {
+    console.log(`received from Lobby: ${e.data}`);
+  }
+
+  useEffect(() => {
+    // use a referenced version of the websocket
+    if (currentWs.current) {
+      currentWs.current.addEventListener('message', handleWebsocketMessage);
+    } else {
+      console.log('websocket is not defined');
+    }
+    return function cleanup() {
+      // clean up from previous render
+      if (props.ws !== currentWs.current) {
+        console.log('Websocket has been updated! Refreshing current websocket');
+        currentWs.current.removeEventListener(
+          'message',
+          handleWebsocketMessage
+        );
+        currentWs.current = props.ws;
+      }
+    };
+  });
+
   useEffect(() => {
     return function cleanup() {
       // cleanup changes after navigating away
@@ -243,7 +304,13 @@ function Lobby() {
             <ExclamationCircle /> May only contain alphanumeric characters
           </div>
         </div>
-        <RoomCard isValid={isValid} room={room} role={role} />
+        <RoomCard
+          isValid={isValid}
+          room={room}
+          role={role}
+          ws={props.ws}
+          key={props.ws}
+        />
       </form>
     </div>
   );
