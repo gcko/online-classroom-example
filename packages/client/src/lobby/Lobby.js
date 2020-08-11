@@ -33,12 +33,15 @@ function EnabledCardContents({ room, role, ws }) {
   const currentWs = useRef(ws);
 
   function handleWebsocketMessage(e) {
-    console.log(`received on EnabledCardContents: ${e.data}`);
-    const msg = JSON.parse(e.data);
-    if (msg.event === 'change:attendance') {
-      // update room
-      setTheRoom(msg.data);
-      console.log(`EnabledCardContents: updated room`);
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.event === 'change:attendance') {
+        // update room
+        setTheRoom(msg.data);
+      }
+    } catch (error) {
+      console.warn(`Message was not JSON parsable. resp: ${e.data}`);
+      console.warn(`Error: ${error}`);
     }
   }
 
@@ -49,12 +52,11 @@ function EnabledCardContents({ room, role, ws }) {
       currentWs.current.addEventListener('message', handleWebsocketMessage);
       // currentWs.current.onmessage = e => {};
     } else {
-      console.log('websocket is not defined');
+      console.warn('websocket is not defined');
     }
     return function cleanup() {
       // clean up from previous render
       if (ws !== currentWs.current) {
-        console.log('Websocket has been updated! Refreshing current websocket');
         currentWs.current.removeEventListener(
           'message',
           handleWebsocketMessage
@@ -100,7 +102,8 @@ function EnabledCardContents({ room, role, ws }) {
         {getRoomAttendance().map(attendee => {
           return (
             <small key={attendee.name} className="d-block">
-              {attendee.amount} {pluralize(attendee.label, attendee.amount)}
+              {attendee.amount}{' '}
+              {pluralize(attendee.label, parseInt(attendee.amount, 10))}
             </small>
           );
         })}
@@ -170,31 +173,6 @@ function Lobby(props) {
   const [room, setRoom] = useState(null);
   const [role, setRole] = useState(null);
   const changed = useRef({});
-  const currentWs = useRef(props.ws);
-
-  function handleWebsocketMessage(e) {
-    console.log(`received from Lobby: ${e.data}`);
-  }
-
-  useEffect(() => {
-    // use a referenced version of the websocket
-    if (currentWs.current) {
-      currentWs.current.addEventListener('message', handleWebsocketMessage);
-    } else {
-      console.log('websocket is not defined');
-    }
-    return function cleanup() {
-      // clean up from previous render
-      if (props.ws !== currentWs.current) {
-        console.log('Websocket has been updated! Refreshing current websocket');
-        currentWs.current.removeEventListener(
-          'message',
-          handleWebsocketMessage
-        );
-        currentWs.current = props.ws;
-      }
-    };
-  });
 
   useEffect(() => {
     return function cleanup() {

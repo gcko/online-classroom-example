@@ -27,24 +27,26 @@ class SubmissionService {
     const room = roomService.getRoom(roomId);
     // Submissions MUST exist tied to a room
     if (room) {
-      let submissionId;
+      let subId;
       if ('submissionId' in room) {
-        // This is actually a PUT (update), not a create
-        submissionId = room.submissionId;
+        // This is a PUT (update), not a create
+        subId = room.submissionId;
       } else {
-        submissionId = this.getLargestSubmissionId() + 1;
+        subId = this.getLargestSubmissionId() + 1;
       }
       // Submissions need to be attached to an existing room
-      this.submissions[submissionId] = {
-        submissionId,
+      this.submissions[subId] = {
+        submissionId: subId,
         roomId,
         text: submission,
       };
       // create or update the room's submissionId
-      room.submissionId = submissionId;
-      // fire event
-      this.trigger('change:submission', this.submissions[submissionId]);
-      return submissionId;
+      room.submissionId = subId;
+      // fire event only if there is some submission
+      if (submission !== '' && submission != null) {
+        this.trigger('change:submission', this.submissions[subId]);
+      }
+      return subId;
     }
     return false;
   }

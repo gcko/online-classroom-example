@@ -62,7 +62,12 @@ class Classroom extends React.Component {
             </p>
           </Modal>
         ) : this.state.isValid ? (
-          <ValidRoom room={this.state.room} params={this.params} />
+          <ValidRoom
+            {...this.props}
+            room={this.state.room}
+            params={this.params}
+            key={this.props.ws}
+          />
         ) : (
           <Redirect
             to={{

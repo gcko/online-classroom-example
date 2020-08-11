@@ -53,7 +53,7 @@ const rooms = {
 const submissions = {
   1: {
     id: '1',
-    text: 'console.log("I am submitted code yo")',
+    text: 'console.log("I am submitted code!")',
     roomId: '11111111',
   },
 };

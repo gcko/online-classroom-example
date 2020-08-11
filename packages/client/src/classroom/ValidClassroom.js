@@ -169,6 +169,7 @@ class ValidRoom extends React.Component {
     this.state = {
       hasSubmission: false,
     };
+    this.ws = this.props.ws;
     this.defaultLog = console.log;
     this.defaultWarn = console.warn;
     this.defaultError = console.error;
@@ -186,10 +187,23 @@ class ValidRoom extends React.Component {
         // no code has been submitted yet, show a notification
         this.setState({ hasSubmission: false });
       }
+      // setup listener only for Instructor
+      if (this.ws) {
+        this.ws.addEventListener('message', this.handleWebsocketMessage);
+      }
     }
     handleKeyboardShortcuts(true);
     // Override console *after* sandboxing eval
     overrideConsole(document.getElementById('console'));
+  }
+
+  componentDidUpdate() {
+    if (this.ws !== this.props.ws) {
+      console.log('Websocket has been updated! Refreshing current websocket');
+      this.ws.removeEventListener('message', this.handleWebsocketMessage);
+      this.ws = this.props.ws;
+      this.ws.addEventListener('message', this.handleWebsocketMessage);
+    }
   }
 
   componentWillUnmount() {
@@ -199,7 +213,25 @@ class ValidRoom extends React.Component {
     console.error = this.defaultError;
     console.clear = this.defaultClear;
     handleKeyboardShortcuts(false);
+    if (this.ws) {
+      this.ws.removeEventListener('message', this.handleWebsocketMessage);
+    }
   }
+
+  handleWebsocketMessage = e => {
+    try {
+      const msg = JSON.parse(e.data);
+      // only submit submission changes on the instructor view
+      if (msg.event === 'change:submission') {
+        this.setState({ hasSubmission: true });
+        this.aceEditor.current.editor.selectAll();
+        this.aceEditor.current.editor.insert(msg.data.text);
+      }
+    } catch (error) {
+      console.warn(`Message was not JSON parsable. resp: ${e.data}`);
+      console.warn(`Error: ${error}`);
+    }
+  };
 
   handleRunCode = () => {
     const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];

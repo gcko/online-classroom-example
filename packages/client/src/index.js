@@ -19,15 +19,14 @@ function Main() {
     }
 
     wsPointer.onopen = () => {
-      console.log('WebSocket connected!');
       setWs(wsPointer);
       // reset the timeout on open of a new connection
       timeout.current = 250;
-      // clearInterval(connectInterval.current);
+      clearInterval(connectInterval.current);
     };
 
     wsPointer.onclose = e => {
-      console.log(
+      console.warn(
         `WebSocket closed. Reconnect will be attempted in ${Math.min(
           10000 / 1000,
           (timeout.current + timeout.current) / 1000
@@ -53,6 +52,7 @@ function Main() {
 
   useEffect(() => {
     websocketConnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // passing an empty dependency array ensures it is only called once, equivalent of compenentDidMount
 
   function check() {

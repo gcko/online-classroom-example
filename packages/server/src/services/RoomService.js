@@ -43,7 +43,7 @@ class RoomService {
       }
       this.trigger('change:attendance', room);
       // TODO return the updated room
-      return true;
+      return room;
     }
     // room didn't exist
     return false;

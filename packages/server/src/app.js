@@ -10,15 +10,6 @@ const { rooms, submissions } = models;
 const roomService = new RoomService(rooms, submissions);
 const submissionService = new SubmissionService(submissions, rooms);
 
-// app.use(function(req, res, next) {
-//   res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); // update to match the domain you will make the request from
-//   res.header(
-//     'Access-Control-Allow-Headers',
-//     'Origin, X-Requested-With, Content-Type, Accept'
-//   );
-//   next();
-// });
-
 app.use((req, res, next) => {
   req.context = {
     models,
@@ -26,7 +17,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Websocket stuff...
+// Initialize the Websocket server
 const wss = new WebSocket.Server({ port: 3334 });
 
 function noop() {}
@@ -35,44 +26,11 @@ function heartbeat() {
   this.isAlive = true;
 }
 
+// eslint-disable-next-line no-unused-vars
 wss.on('connection', function connection(ws, req) {
   // eslint-disable-next-line no-param-reassign
   ws.isAlive = true;
   ws.on('pong', heartbeat);
-  ws.on('message', function incoming(message) {
-    if (message.indexOf('connections') > -1) {
-      ws.send(`Number of connected clients: ${wss.clients.size}`);
-      ws.send(`url: ${req.url}`);
-    } else {
-      wss.clients.forEach(function each(client) {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(`received: ${message}`);
-        }
-      });
-      console.log(`received: ${message} from client`);
-    }
-  });
-  ws.on('close', function closed(code, reason) {
-    console.log(`connection was closed: ${code}, ${reason}`);
-    wss.clients.forEach(function each(client) {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(
-          `Client closed! Number of connected clients: ${wss.clients.size}`
-        );
-      }
-    });
-  });
-  ws.send(`Number of connected clients: ${wss.clients.size}`);
-  function broadcast(msg) {
-    wss.clients.forEach(function each(client) {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(msg);
-      }
-    });
-  }
-  broadcast(
-    `New client connected! Number of connected clients: ${wss.clients.size}`
-  );
   // Event Handlers for model updates
   function handleSubmission(submission) {
     const msg = {
@@ -92,6 +50,7 @@ wss.on('connection', function connection(ws, req) {
   roomService.on('change:attendance', handleAttendance);
 });
 
+// Terminate connections that are no longer alive
 const interval = setInterval(function ping() {
   wss.clients.forEach(function each(ws) {
     if (ws.isAlive === false) {
