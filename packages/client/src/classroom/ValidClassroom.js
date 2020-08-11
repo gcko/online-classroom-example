@@ -238,13 +238,36 @@ class ValidRoom extends React.Component {
     sandboxedEval(editorTextEl);
   };
 
+  waitNSeconds = num => {
+    const seconds = num * 1000;
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve('resolved');
+      }, seconds);
+    });
+  };
+
+  changeToSubmitAfterNSeconds = num => {
+    const seconds = num * 1000;
+    return new Promise(resolve => {
+      setTimeout(() => {
+        if (document.getElementById('submit-code')) {
+          // only operate if the element is still around
+          document.getElementById('submit-code').innerText = 'Submit';
+        }
+        resolve('resolved');
+      }, seconds);
+    });
+  };
+
   handleSubmitCode = async () => {
     const body = {
       roomId: this.room.id,
       submission: document.getElementsByClassName('ace_text-layer')[0]
         .innerText,
     };
-    // TODO change text to "Submitting..."
+    document.getElementById('submit-code').innerText = 'Submitting...';
+    await this.waitNSeconds(2);
     const response = await fetch(`/api/submissions`, {
       method: 'POST',
       headers: {
@@ -252,9 +275,9 @@ class ValidRoom extends React.Component {
       },
       body: JSON.stringify(body),
     });
-    const responseJson = await response.json();
-    // TODO change text to "Submitted!"
-    console.log(responseJson);
+    await response.json();
+    document.getElementById('submit-code').innerText = 'Submitted!';
+    await this.changeToSubmitAfterNSeconds(2);
   };
 
   render() {
