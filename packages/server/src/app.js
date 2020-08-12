@@ -114,6 +114,13 @@ app.put('/api/rooms/:roomId', (req, res) => {
   res.send({ updated: status });
 });
 
+app.post('/api/rooms/:roomId/:role/decrement', req => {
+  const { roomId, role } = req.params;
+  roomService.decrementRoleAmount(roomId, role);
+  // this is for navigator.sendBeacon;
+  // the browser does not listen for a result, do not send a result
+});
+
 app.get('/api/submissions', (req, res) => {
   res.send(submissionService.getSubmissions());
 });

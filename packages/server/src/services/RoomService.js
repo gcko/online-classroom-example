@@ -47,6 +47,20 @@ class RoomService {
     // room didn't exist
     return false;
   }
+
+  decrementRoleAmount(roomId, role) {
+    const room = this.getRoom(roomId);
+    if ('attendance' in room) {
+      const att = room.attendance;
+      // find the role, set the amount to 0
+      for (let i = 0; i < att.length; i += 1) {
+        if (att[i].name === role) {
+          att[i].amount = 0;
+        }
+      }
+      this.trigger('change:attendance', room);
+    }
+  }
 }
 // Add the event handler
 Object.assign(RoomService.prototype, eventMixin);

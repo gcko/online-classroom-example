@@ -23,7 +23,7 @@ const rooms = {
       {
         name: 'instructor',
         label: 'Instructor',
-        amount: 1,
+        amount: 0,
       },
       {
         name: 'student',
@@ -39,12 +39,12 @@ const rooms = {
       {
         name: 'instructor',
         label: 'Instructor',
-        amount: 1,
+        amount: 0,
       },
       {
         name: 'student',
         label: 'Student',
-        amount: 1,
+        amount: 0,
       },
     ],
   },

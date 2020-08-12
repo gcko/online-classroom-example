@@ -8,7 +8,6 @@ import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
 import Modal from '../common/Modal';
 import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
-import { updateAttendance } from './common';
 
 // Custom Dev Console output
 // https://github.com/iambenkay/js-ide/blob/master/index.html
@@ -161,6 +160,14 @@ async function getSubmission(roomId) {
   return submission;
 }
 
+async function onUnmount() {
+  // Decrement attendance
+  // Use Navigator beacon so that even on tab/browser close it will fire
+  navigator.sendBeacon(
+    `/api/rooms/${this.room.id}/${this.params.role}/decrement`
+  );
+}
+
 class ValidRoom extends React.Component {
   constructor(props) {
     super(props);
@@ -175,9 +182,11 @@ class ValidRoom extends React.Component {
     this.defaultWarn = console.warn;
     this.defaultError = console.error;
     this.defaultClear = console.clear;
+    this.boundOnUnmount = onUnmount.bind(this, false);
   }
 
   async componentDidMount() {
+    window.addEventListener('beforeunload', this.boundOnUnmount, false);
     if (this.params.role === ROLE_INSTRUCTOR) {
       if (this.room.submissionId) {
         // Show the submitted code
@@ -208,8 +217,8 @@ class ValidRoom extends React.Component {
   }
 
   async componentWillUnmount() {
-    // Decrement attendance
-    await updateAttendance(this.room, this.params.role, false);
+    window.removeEventListener('beforeunload', this.boundOnUnmount, false);
+    this.boundOnUnmount();
     // remove override
     console.log = this.defaultLog;
     console.warn = this.defaultWarn;
