@@ -4,9 +4,6 @@
   "private": true,
   "proxy": "http://localhost:3333",
   "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
     "ace-builds": "^1.4.12",
     "autoprefixer": "^9.8.6",
     "bootstrap": "^4.5.1",
@@ -20,6 +17,11 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.0",
     "react-style-tag": "^2.0.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2"
   },
   "scripts": {
     "lint": "eslint '**/*.js'",

@@ -75,6 +75,10 @@ wss.on('close', function close() {
 
 app.use(bodyParser.json());
 
+app.get('/', (req, res) => {
+  res.redirect(301, '/api');
+});
+
 app.get('/api', (req, res) => res.send({ version: '0.1' }));
 
 // Rooms

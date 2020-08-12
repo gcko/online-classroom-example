@@ -267,7 +267,7 @@ function Lobby(props) {
             className="form-control"
             id="room-id"
             placeholder="Enter Room ID: e.g. AB12CD34"
-            pattern="[0-9a-zA-Z]{8}"
+            pattern="^[0-9a-zA-Z]{8}$"
             maxLength="8"
             required
           />
