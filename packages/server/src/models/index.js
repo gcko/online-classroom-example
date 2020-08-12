@@ -16,9 +16,9 @@ const rooms = {
       },
     ],
   },
-  ABCDEFGH: {
-    id: 'ABCDEFGH',
-    name: 'Javascript 201',
+  11111112: {
+    id: '11111112',
+    name: 'Javascript 102',
     attendance: [
       {
         name: 'instructor',
@@ -32,9 +32,9 @@ const rooms = {
       },
     ],
   },
-  11111112: {
-    id: '11111112',
-    name: 'Javascript 102',
+  11111113: {
+    id: '11111113',
+    name: 'Javascript 201',
     attendance: [
       {
         name: 'instructor',
