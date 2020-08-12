@@ -5,8 +5,8 @@ const models = require('./models');
 const { RoomService, SubmissionService } = require('./services');
 
 const { rooms, submissions } = models;
-// init services
 
+// init services
 const roomService = new RoomService(rooms, submissions);
 const submissionService = new SubmissionService(submissions, rooms);
 
@@ -26,8 +26,7 @@ function heartbeat() {
   this.isAlive = true;
 }
 
-// eslint-disable-next-line no-unused-vars
-wss.on('connection', function connection(ws, req) {
+wss.on('connection', function connection(ws) {
   // eslint-disable-next-line no-param-reassign
   ws.isAlive = true;
   ws.on('pong', heartbeat);
@@ -66,13 +65,6 @@ wss.on('close', function close() {
   clearInterval(interval);
 });
 
-// // Add HTTP status to error messages
-// function error(status, msg) {
-//   var err = new Error(msg);
-//   err.status = status;
-//   return err;
-// }
-
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
@@ -100,7 +92,6 @@ app.get('/api/rooms/:roomId', (req, res) => {
 
 app.get('/api/rooms/:roomId/submission', (req, res) => {
   const { roomId } = req.params;
-  // const room = roomService.getRoom(roomId);
   const submission = roomService.getRoomSubmission(roomId, submissionService);
 
   if (submission) {
