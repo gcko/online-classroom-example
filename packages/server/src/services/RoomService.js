@@ -40,8 +40,8 @@ class RoomService {
       if ('attendance' in body) {
         // you can update the attendance of a room
         room.attendance = body.attendance;
+        this.trigger('change:attendance', room);
       }
-      this.trigger('change:attendance', room);
       return room;
     }
     // room didn't exist

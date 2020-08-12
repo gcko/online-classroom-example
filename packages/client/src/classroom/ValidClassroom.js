@@ -8,6 +8,7 @@ import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
 import Modal from '../common/Modal';
 import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
+import { updateAttendance } from './common';
 
 // Custom Dev Console output
 // https://github.com/iambenkay/js-ide/blob/master/index.html
@@ -90,18 +91,18 @@ const sandboxGlobals = {
   window: {},
   document: {},
 };
-function sandboxedEval(codeEl) {
-  function createSandbox(code, thatContext, sandboxedGlobals) {
+function sandboxEval(codeEl) {
+  function createSandbox(code, thatContext, limitedGlobals) {
     const params = []; // the names of local variables
     const args = []; // the local variables
 
-    const keys = Object.keys(sandboxedGlobals);
+    const keys = Object.keys(limitedGlobals);
     for (let i = 0; i < keys.length; i += 1) {
       const param = keys[i];
       // console.log(`param: ${param}`);
       // eslint-disable-next-line no-prototype-builtins
-      if (Object.prototype.hasOwnProperty.call(sandboxedGlobals, param)) {
-        args.push(sandboxedGlobals[param]);
+      if (Object.prototype.hasOwnProperty.call(limitedGlobals, param)) {
+        args.push(limitedGlobals[param]);
         params.push(param);
       }
     }
@@ -134,7 +135,7 @@ function kbdSecondKey(e) {
   if (e.key === 'i') console.clear();
   const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
   if (e.key === 'Enter') {
-    sandboxedEval(editorTextEl);
+    sandboxEval(editorTextEl);
   }
 }
 function kbdFirstKey(e) {
@@ -193,7 +194,7 @@ class ValidRoom extends React.Component {
       }
     }
     handleKeyboardShortcuts(true);
-    // Override console *after* sandboxing eval
+    // Override console *after* creating a sandbox around eval
     overrideConsole(document.getElementById('console'));
   }
 
@@ -206,7 +207,9 @@ class ValidRoom extends React.Component {
     }
   }
 
-  componentWillUnmount() {
+  async componentWillUnmount() {
+    // Decrement attendance
+    await updateAttendance(this.room, this.params.role, false);
     // remove override
     console.log = this.defaultLog;
     console.warn = this.defaultWarn;
@@ -235,7 +238,7 @@ class ValidRoom extends React.Component {
 
   handleRunCode = () => {
     const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
-    sandboxedEval(editorTextEl);
+    sandboxEval(editorTextEl);
   };
 
   waitNSeconds = num => {

@@ -3,6 +3,7 @@ import { Link, Redirect } from 'react-router-dom';
 import './Classroom.sass';
 import Modal from '../common/Modal';
 import ValidRoom from './ValidClassroom';
+import { updateAttendance } from './common';
 
 async function getRoom(roomId) {
   const response = await fetch(`/api/rooms/${roomId}`);
@@ -13,7 +14,7 @@ async function getRoom(roomId) {
 function isRoleFull(attendee, attendance) {
   for (let i = 0; i < attendance.length; i += 1) {
     if (attendance[i].name === attendee) {
-      return attendance[i].amount > 0;
+      return parseInt(attendance[i].amount, 10) > 0;
     }
   }
   // the role wasn't found!
@@ -41,10 +42,14 @@ class Classroom extends React.Component {
 
   async componentDidMount() {
     const room = await getRoom(this.params.roomId);
-    // adding some time to view the message as it shows for only a brief second without it.
-    await resolveAfterNSeconds(3);
     // Check if the role is in use
     const isRoleFilled = isRoleFull(this.params.role, room.attendance);
+    if (!isRoleFilled) {
+      // Update the room's attendance
+      await updateAttendance(room, this.params.role);
+    }
+    // adding some time to view the message as it shows for only a brief second without it.
+    await resolveAfterNSeconds(3);
     this.setState({ room });
     this.setState({ isValid: !!room && !!room.id && !isRoleFilled });
   }
