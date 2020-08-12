@@ -35,4 +35,4 @@ In the project directory, you can run:
 
 ### `yarn test`
 
-To see a brief build out of test, please check [Lobby.test.js](src/lobby/Lobby.test.js).
+To see a brief list of tests, please check [Lobby.test.js](src/lobby/Lobby.test.js).
