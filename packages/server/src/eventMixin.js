@@ -34,7 +34,7 @@ const eventMixin = {
    *  this.trigger('select', data1, data2);
    */
   trigger(eventName, ...args) {
-    if (!this._eventHandlers && !this._eventHandlers[eventName]) {
+    if (!this._eventHandlers || !this._eventHandlers[eventName]) {
       return; // no handlers for that event name
     }
 
