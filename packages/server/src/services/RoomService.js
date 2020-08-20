@@ -7,7 +7,13 @@ class RoomService {
   }
 
   getRooms() {
-    return this.rooms;
+    // return rooms as a simple array of objects
+    const rooms = [];
+    for (let i = 0; i < Object.keys(this.rooms).length; i += 1) {
+      // push the room at a specific key to the simple array
+      rooms.push(this.rooms[Object.keys(this.rooms)[i]]);
+    }
+    return rooms;
   }
 
   getRoom(roomId) {
