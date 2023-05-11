@@ -1,4 +1,4 @@
-# Xccelerate Engineering Offsite
+# Online Classroom Example
 
 ## Getting Started
 
@@ -11,8 +11,6 @@ You'll find a React App in `packages/client`. You will find it to contain a Lobb
 
 1. Lobby
 2. Classroom
-
-note: this is not mobile responsive at the moment.
 
 #### Lobby
 
