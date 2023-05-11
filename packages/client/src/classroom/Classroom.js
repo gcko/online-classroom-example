@@ -1,20 +1,21 @@
-import React from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
 import './Classroom.sass';
 import Modal from '../common/Modal';
 import ValidRoom from './ValidClassroom';
 import { updateAttendance } from './common';
+import Layout from '../Layout';
 
 async function getRoom(roomId) {
   const response = await fetch(`/api/rooms/${roomId}`);
-  const room = await response.json();
-  return room;
+  return response.json();
 }
 
 function isRoleFull(attendee, attendance) {
-  for (let i = 0; i < attendance.length; i += 1) {
-    if (attendance[i].name === attendee) {
-      return parseInt(attendance[i].amount, 10) > 0;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const element of attendance) {
+    if (element.name === attendee) {
+      return parseInt(element.amount, 10) > 0;
     }
   }
   // the role wasn't found!
@@ -23,66 +24,75 @@ function isRoleFull(attendee, attendance) {
 
 function resolveAfterNSeconds(num) {
   const seconds = num * 1000;
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       resolve('resolved');
     }, seconds);
   });
 }
 
-class Classroom extends React.Component {
-  constructor(props) {
-    super(props);
-    this.params = this.props.match.params;
-    this.state = {
-      room: null,
-      isValid: 'pending',
-    };
-  }
+function Classroom({ ws }) {
+  const { roomId, role } = useParams();
+  const [room, setRoom] = useState(null);
+  const [isValid, setIsValid] = useState('pending');
 
-  async componentDidMount() {
-    const room = await getRoom(this.params.roomId);
-    // Check if the role is in use
-    const isRoleFilled = isRoleFull(this.params.role, room.attendance);
-    if (!isRoleFilled) {
-      // Update the room's attendance
-      await updateAttendance(room, this.params.role);
+  useEffect(() => {
+    async function fetchData() {
+      const newRoom = await getRoom(roomId);
+      // Check if the role is in use
+      const isRoleFilled = isRoleFull(role, newRoom.attendance);
+      if (!isRoleFilled) {
+        // Update the room's attendance
+        await updateAttendance(newRoom, role);
+      }
+      // adding some time to view the message as it shows for only a brief second without it.
+      await resolveAfterNSeconds(3);
+      setRoom(newRoom);
+      setIsValid(!!newRoom && !!newRoom.id && !isRoleFilled);
     }
-    // adding some time to view the message as it shows for only a brief second without it.
-    await resolveAfterNSeconds(3);
-    this.setState({ room });
-    this.setState({ isValid: !!room && !!room.id && !isRoleFilled });
-  }
+    fetchData();
+  }, [roomId, role]);
 
-  render() {
+  if (isValid === true) {
     return (
-      // First check the roomId is valid
       <>
-        {/* eslint-disable-next-line no-nested-ternary */}
-        {this.state.isValid === 'pending' ? (
-          <Modal title="Wait for verification">
-            <p>Verifying the room code and availability...</p>
-            <p>
-              Go back to the <Link to="/">Lobby</Link>.
-            </p>
-          </Modal>
-        ) : this.state.isValid ? (
-          <ValidRoom
-            {...this.props}
-            room={this.state.room}
-            params={this.params}
-            key={this.props.ws}
+        <ValidRoom room={room} role={role} key={ws} />
+        <Routes>
+          <Route path=":roomId" element={<Classroom />} />
+          <Route
+            path=":roomId/:role"
+            element={<ValidRoom room={room} role={role} key={ws} />}
           />
-        ) : (
-          <Redirect
-            to={{
-              pathname: '/',
-            }}
-          />
-        )}
+        </Routes>
       </>
     );
   }
+  if (isValid === false) {
+    return (
+      <Navigate
+        to={{
+          pathname: '/',
+        }}
+      />
+    );
+  }
+  // default to waiting for verification
+  return (
+    <Layout>
+      <Modal title="Wait for verification">
+        <p>Verifying the room code and availability...</p>
+        <p>
+          Go back to the <Link to="/">Lobby</Link>.
+        </p>
+      </Modal>
+      <Routes>
+        <Route path=":roomId" element={<Classroom />} />
+        <Route
+          path=":roomId/:role"
+          element={<ValidRoom room={room} role={role} key={ws} />}
+        />
+      </Routes>
+    </Layout>
+  );
 }
-
 export default Classroom;

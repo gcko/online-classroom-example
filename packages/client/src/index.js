@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { BrowserRouter as Router, Link, Route } from 'react-router-dom';
-import ReactDOM from 'react-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { createRoot } from 'react-dom/client';
 import './index.sass';
 import * as serviceWorker from './serviceWorker';
 import Lobby from './lobby/Lobby';
@@ -26,7 +26,7 @@ function Main() {
       clearInterval(connectInterval.current);
     };
 
-    wsPointer.onclose = e => {
+    wsPointer.onclose = (e) => {
       console.warn(
         `WebSocket closed. Reconnect will be attempted in ${Math.min(
           10000 / 1000,
@@ -42,7 +42,7 @@ function Main() {
       );
     };
 
-    wsPointer.onerror = err => {
+    wsPointer.onerror = (err) => {
       console.error(
         `Websocket encountered an error: ${err.message}, Closing socket.`
       );
@@ -63,42 +63,18 @@ function Main() {
   }
 
   return (
-    <Router>
-      <div className="amplify-app">
-        <div className="top-page-content">
-          <h2 className="col-3">
-            <Link to="/" title="Back to the Lobby">
-              Amplify <small>your skill</small>
-            </Link>
-          </h2>
-        </div>
-        <div className="content">
-          <Route
-            exact
-            path="/"
-            render={props => <Lobby {...props} ws={ws} key={ws} />}
-          />
-          {/* catch routing to base path as well */}
-          <Route exact path="/room" component={Classroom} />
-          <Route exact path="/room/:roomId" component={Classroom} />
-          <Route
-            exact
-            path="/room/:roomId/:role"
-            render={props => <Classroom {...props} ws={ws} key={ws} />}
-          />
-          <Route exact path="/terms-of-service" component={TermsOfService} />
-        </div>
-        <footer>
-          <Link to="/terms-of-service">Terms of Service</Link>
-          <a href="mailto:jared.scott@variable.team">Contact support</a>
-          <span>© 2020 Variable.</span>
-        </footer>
-      </div>
-    </Router>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Lobby ws={ws} key={ws} />} />
+        {/* catch routing to base path as well */}
+        <Route path="/room/*" element={<Classroom />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
-ReactDOM.render(<Main />, document.getElementById('root'));
+createRoot(document.getElementById('root')).render(<Main />);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

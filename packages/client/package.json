@@ -1,27 +1,27 @@
 {
-  "name": "@xccelerate-offsite/client",
+  "name": "@classroom/client",
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:3333",
   "dependencies": {
-    "ace-builds": "^1.4.12",
-    "autoprefixer": "^9.8.6",
-    "bootstrap": "^4.5.1",
-    "node-sass": "^4.14.1",
+    "ace-builds": "^1.20.0",
+    "autoprefixer": "^10.4.14",
+    "bootstrap": "^5.2.3",
+    "node-sass": "^8.0.0",
     "pluralize": "^8.0.0",
-    "react": "^16.13.0",
-    "react-ace": "^9.1.2",
-    "react-bootstrap-icons": "^1.0.3-alpha5",
-    "react-dom": "^16.13.0",
+    "react": "^18.2.0",
+    "react-ace": "^10.1.0",
+    "react-bootstrap-icons": "^1.10.3",
+    "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
-    "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.0",
-    "react-style-tag": "^2.0.1"
+    "react-router-dom": "^6.11.1",
+    "react-scripts": "5.0.1",
+    "react-style-tag": "^3.0.1"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2"
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.4.3"
   },
   "scripts": {
     "lint": "eslint '**/*.js'",

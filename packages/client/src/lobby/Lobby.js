@@ -2,13 +2,23 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import {
-  XCircleFill,
-  ExclamationCircle,
   ChevronBarRight,
+  ExclamationCircle,
+  XCircleFill,
 } from 'react-bootstrap-icons';
 import pluralize from 'pluralize';
 import './Lobby.sass';
 import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
+import Layout from '../Layout';
+
+function Tooltip(props) {
+  return (
+    <div className="tooltip fade bs-tooltip-right show" role="tooltip">
+      <div className="arrow" />
+      <div className="tooltip-inner">{props.children}</div>
+    </div>
+  );
+}
 
 function DisabledCardContents() {
   return (
@@ -48,9 +58,7 @@ function EnabledCardContents({ room, role, ws }) {
   useEffect(() => {
     // use a referenced version of the websocket
     if (currentWs.current) {
-      // currentWs.current.send('sending from EnabledCardContents :)');
       currentWs.current.addEventListener('message', handleWebsocketMessage);
-      // currentWs.current.onmessage = e => {};
     } else {
       console.warn('websocket is not defined');
     }
@@ -71,20 +79,12 @@ function EnabledCardContents({ room, role, ws }) {
     return ARoom.attendance;
   }
 
-  function Tooltip(props) {
-    return (
-      <div className="tooltip fade bs-tooltip-right show" role="tooltip">
-        <div className="arrow" />
-        <div className="tooltip-inner">{props.children}</div>
-      </div>
-    );
-  }
-
   function isRoleFull(attendee = role) {
     const attendance = getRoomAttendance();
-    for (let i = 0; i < attendance.length; i += 1) {
-      if (attendance[i].name === attendee) {
-        return attendance[i].amount > 0;
+    // eslint-disable-next-line no-restricted-syntax
+    for (const element of attendance) {
+      if (element.name === attendee) {
+        return element.amount > 0;
       }
     }
     // the role wasn't found!
@@ -99,16 +99,13 @@ function EnabledCardContents({ room, role, ws }) {
     <div className="card-body row align-items-center">
       <div className="card-text col-10 mb-0">
         <p>{(theRoom || room).name}</p>
-        {getRoomAttendance().map(attendee => {
-          return (
-            <small key={attendee.name} className="d-block">
-              {attendee.amount}{' '}
-              {pluralize(attendee.label, parseInt(attendee.amount, 10))}
-            </small>
-          );
-        })}
+        {getRoomAttendance().map((attendee) => (
+          <small key={attendee.name} className="d-block">
+            {attendee.amount}{' '}
+            {pluralize(attendee.label, parseInt(attendee.amount, 10))}
+          </small>
+        ))}
       </div>
-      {/* TODO refactor this - only minor changes occur to the code */}
       {/* eslint-disable-next-line no-nested-ternary */}
       {isClassFull() ? (
         <>
@@ -174,12 +171,14 @@ function Lobby(props) {
   const [role, setRole] = useState(null);
   const changed = useRef({});
 
-  useEffect(() => {
-    return function cleanup() {
-      // cleanup changes after navigating away
-      changed.current = {};
-    };
-  }, []);
+  useEffect(
+    () =>
+      function cleanup() {
+        // cleanup changes after navigating away
+        changed.current = {};
+      },
+    []
+  );
 
   async function formValidator(e) {
     const targetEl = e.target;
@@ -232,65 +231,67 @@ function Lobby(props) {
   }
 
   return (
-    <div className="lobby">
-      <Helmet>
-        <title>Lobby | Amplify</title>
-        <link rel="canonical" href="https://amplifyourskill.com/" />
-      </Helmet>
-      <p className="pt-3 pl-3">
-        Welcome to Amplify, were we endeavor to amplify your skill!
-      </p>
-      <p className="pl-3">
-        Below please select your role and enter the room identifier provided to
-        you.
-      </p>
-      <form
-        className="col-4"
-        onChange={formValidator}
-        onSubmit={e => e.preventDefault()}
-      >
-        <div className="form-group">
-          <select
-            className="form-control"
-            id="role-select"
-            defaultValue="Select a role..."
-            required
-          >
-            <option disabled>Select a role...</option>
-            <option value={ROLE_STUDENT}>Student</option>
-            <option value={ROLE_INSTRUCTOR}>Instructor</option>
-          </select>
-        </div>
-        <div className="form-group position-relative">
-          <input
-            type="text"
-            className="form-control"
-            id="room-id"
-            placeholder="Enter Room ID: e.g. AB12CD34"
-            pattern="^[0-9a-zA-Z]{8}$"
-            maxLength="8"
-            required
+    <Layout>
+      <div className="lobby">
+        <Helmet>
+          <title>Lobby | Amplify</title>
+          <link rel="canonical" href="https://amplifyourskill.com/" />
+        </Helmet>
+        <p className="pt-3 pl-3">
+          Welcome to Amplify, were we endeavor to amplify your skill!
+        </p>
+        <p className="pl-3">
+          Below please select your role and enter the room identifier provided
+          to you.
+        </p>
+        <form
+          className="col-4"
+          onChange={formValidator}
+          onSubmit={(e) => e.preventDefault()}
+        >
+          <div className="form-group">
+            <select
+              className="form-control"
+              id="role-select"
+              defaultValue="Select a role..."
+              required
+            >
+              <option disabled>Select a role...</option>
+              <option value={ROLE_STUDENT}>Student</option>
+              <option value={ROLE_INSTRUCTOR}>Instructor</option>
+            </select>
+          </div>
+          <div className="form-group position-relative">
+            <input
+              type="text"
+              className="form-control"
+              id="room-id"
+              placeholder="Enter Room ID: e.g. AB12CD34"
+              pattern="^[0-9a-zA-Z]{8}$"
+              maxLength="8"
+              required
+            />
+            <div id="not-real-room-id" className="invalid-tooltip d-none">
+              This room has not been created yet
+            </div>
+            <div className="valid-tooltip">Correct!</div>
+            <div className="conditional-feedback">
+              <ExclamationCircle /> Must be 8 characters in length
+            </div>
+            <div className="conditional-feedback">
+              <ExclamationCircle /> May only contain alphanumeric characters
+            </div>
+          </div>
+          <RoomCard
+            isValid={isValid}
+            room={room}
+            role={role}
+            ws={props.ws}
+            key={props.ws}
           />
-          <div id="not-real-room-id" className="invalid-tooltip d-none">
-            This room has not been created yet
-          </div>
-          <div className="valid-tooltip">Correct!</div>
-          <div className="conditional-feedback">
-            <ExclamationCircle /> Must be 8 characters in length
-          </div>
-          <div className="conditional-feedback">
-            <ExclamationCircle /> May only contain alphanumeric characters
-          </div>
-        </div>
-        <RoomCard
-          isValid={isValid}
-          room={room}
-          role={role}
-          ws={props.ws}
-          key={props.ws}
-        />
-      </form>
-    </div>
+        </form>
+      </div>
+    </Layout>
   );
 }
 

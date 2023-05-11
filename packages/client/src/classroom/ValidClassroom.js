@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console,class-methods-use-this */
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Style } from 'react-style-tag';
@@ -8,6 +8,7 @@ import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
 import Modal from '../common/Modal';
 import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
+import Layout from '../Layout';
 
 // Custom Dev Console output
 // https://github.com/iambenkay/js-ide/blob/master/index.html
@@ -27,8 +28,9 @@ function overrideConsole(consoleElement) {
   console.log = function log(...args) {
     let currentLog = '';
     const argsArray = [...args];
-    for (let i = 0; i < argsArray.length; i += 1) {
-      const arg = argsArray[i];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const element of argsArray) {
+      const arg = element;
       if (typeof arg === 'object') {
         currentLog += `${
           JSON && JSON.stringify ? JSON.stringify(arg, undefined, 2) : arg
@@ -96,8 +98,9 @@ function sandboxEval(codeEl) {
     const args = []; // the local variables
 
     const keys = Object.keys(limitedGlobals);
-    for (let i = 0; i < keys.length; i += 1) {
-      const param = keys[i];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const element of keys) {
+      const param = element;
       // console.log(`param: ${param}`);
       // eslint-disable-next-line no-prototype-builtins
       if (Object.prototype.hasOwnProperty.call(limitedGlobals, param)) {
@@ -156,23 +159,20 @@ function handleKeyboardShortcuts(on = true) {
 
 async function getSubmission(roomId) {
   const response = await fetch(`/api/rooms/${roomId}/submission`);
-  const submission = await response.json();
-  return submission;
+  return response.json();
 }
 
 async function onUnmount() {
   // Decrement attendance
   // Use Navigator beacon so that even on tab/browser close it will fire
-  navigator.sendBeacon(
-    `/api/rooms/${this.room.id}/${this.params.role}/decrement`
-  );
+  navigator.sendBeacon(`/api/rooms/${this.room.id}/${this.role}/decrement`);
 }
 
 class ValidRoom extends React.Component {
   constructor(props) {
     super(props);
     this.aceEditor = React.createRef();
-    this.params = this.props.params;
+    this.role = this.props.role;
     this.room = this.props.room;
     this.state = {
       hasSubmission: false,
@@ -187,7 +187,7 @@ class ValidRoom extends React.Component {
 
   async componentDidMount() {
     window.addEventListener('beforeunload', this.boundOnUnmount, false);
-    if (this.params.role === ROLE_INSTRUCTOR) {
+    if (this.role === ROLE_INSTRUCTOR) {
       if (this.room.submissionId) {
         // Show the submitted code
         const submission = await getSubmission(this.room.id);
@@ -230,7 +230,7 @@ class ValidRoom extends React.Component {
     }
   }
 
-  handleWebsocketMessage = e => {
+  handleWebsocketMessage = (e) => {
     try {
       const msg = JSON.parse(e.data);
       // only submit submission changes on the instructor view
@@ -250,18 +250,18 @@ class ValidRoom extends React.Component {
     sandboxEval(editorTextEl);
   };
 
-  waitNSeconds = num => {
+  waitNSeconds = (num) => {
     const seconds = num * 1000;
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         resolve('resolved');
       }, seconds);
     });
   };
 
-  changeToSubmitAfterNSeconds = num => {
+  changeToSubmitAfterNSeconds = (num) => {
     const seconds = num * 1000;
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         if (document.getElementById('submit-code')) {
           // only operate if the element is still around
@@ -275,8 +275,8 @@ class ValidRoom extends React.Component {
   handleSubmitCode = async () => {
     const body = {
       roomId: this.room.id,
-      submission: document.getElementsByClassName('ace_text-layer')[0]
-        .innerText,
+      submission:
+        document.getElementsByClassName('ace_text-layer')[0].innerText,
     };
     document.getElementById('submit-code').innerText = 'Submitting...';
     await this.waitNSeconds(2);
@@ -294,9 +294,10 @@ class ValidRoom extends React.Component {
 
   render() {
     return (
-      <div className="classroom row no-gutters">
-        <Style>
-          {`
+      <Layout>
+        <div className="classroom row no-gutters">
+          <Style>
+            {`
         .amplify-app > footer a,
           .amplify-app > footer a,
           .amplify-app > footer a:visited,
@@ -306,56 +307,57 @@ class ValidRoom extends React.Component {
           color: #FFEFFF;
         }
       `}
-        </Style>
-        <Helmet>
-          <title>{`${this.room.name} | Amplify`}</title>
-        </Helmet>
-        <div className="run-code-wrapper position-absolute">
-          <button
-            type="button"
-            id="run-code"
-            className="btn btn-sm btn-outline-light"
-            onClick={this.handleRunCode}
-          >
-            Run &gt;
-          </button>
-          <small className="text-white font-italic ml-1">
-            Or press ctrl-enter to run
-          </small>
+          </Style>
+          <Helmet>
+            <title>{`${this.room?.name} | Amplify`}</title>
+          </Helmet>
+          <div className="run-code-wrapper position-absolute">
+            <button
+              type="button"
+              id="run-code"
+              className="btn btn-sm btn-outline-light"
+              onClick={this.handleRunCode}
+            >
+              Run &gt;
+            </button>
+            <small className="text-white font-italic ml-1">
+              Or press ctrl-enter to run
+            </small>
+          </div>
+          {ROLE_STUDENT === this.role && (
+            <button
+              type="button"
+              id="submit-code"
+              className="btn btn-sm btn-outline-light position-absolute"
+              onMouseUp={this.handleSubmitCode}
+            >
+              Submit
+            </button>
+          )}
+          <AceEditor
+            mode="javascript"
+            theme="monokai"
+            name="amplify-code-editor"
+            placeholder='console.log("hello world!");'
+            width="auto"
+            // value=""
+            className="col-8"
+            ref={this.aceEditor}
+            editorProps={{ $blockScrolling: true }}
+          />
+          <pre id="console" className="col-4 pl-1">
+            &raquo;{' '}
+          </pre>
+          {!this.state.hasSubmission && ROLE_INSTRUCTOR === this.role && (
+            <Modal title="Wait for submission">
+              <p>No submission has been made yet. Please wait...</p>
+              <p>
+                Go back to the <Link to="/">Lobby</Link>.
+              </p>
+            </Modal>
+          )}
         </div>
-        {ROLE_STUDENT === this.params.role && (
-          <button
-            type="button"
-            id="submit-code"
-            className="btn btn-sm btn-outline-light position-absolute"
-            onMouseUp={this.handleSubmitCode}
-          >
-            Submit
-          </button>
-        )}
-        <AceEditor
-          mode="javascript"
-          theme="monokai"
-          name="amplify-code-editor"
-          placeholder='console.log("hello world!");'
-          width="auto"
-          // value=""
-          className="col-8"
-          ref={this.aceEditor}
-          editorProps={{ $blockScrolling: true }}
-        />
-        <pre id="console" className="col-4 pl-1">
-          &raquo;{' '}
-        </pre>
-        {!this.state.hasSubmission && ROLE_INSTRUCTOR === this.params.role && (
-          <Modal title="Wait for submission">
-            <p>No submission has been made yet. Please wait...</p>
-            <p>
-              Go back to the <Link to="/">Lobby</Link>.
-            </p>
-          </Modal>
-        )}
-      </div>
+      </Layout>
     );
   }
 }
