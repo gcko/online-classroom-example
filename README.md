@@ -2,8 +2,8 @@
 
 ## Getting Started
 
-- `yarn`
-- `yarn start:<PACKAGE_NAME>` OR `yarn start` should you wish to serve both the frontend and backend in parallel
+- `npm install`
+- `npm run start:<PACKAGE_NAME>` OR `npm start` should you wish to serve both the frontend and backend in parallel
 
 ### Frontend
 
