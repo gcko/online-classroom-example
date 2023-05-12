@@ -6,6 +6,8 @@ import { Helmet } from 'react-helmet';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
+import 'ace-builds/src-noconflict/ext-language_tools';
+import 'ace-builds/webpack-resolver';
 import Modal from '../common/Modal';
 import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
 import Layout from '../Layout';
@@ -207,7 +209,8 @@ class ValidRoom extends React.Component {
     overrideConsole(document.getElementById('console'));
   }
 
-  componentDidUpdate() {
+  // eslint-disable-next-line no-unused-vars
+  componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.ws !== this.props.ws) {
       console.log('Websocket has been updated! Refreshing current websocket');
       this.ws.removeEventListener('message', this.handleWebsocketMessage);
@@ -315,7 +318,7 @@ class ValidRoom extends React.Component {
             <button
               type="button"
               id="run-code"
-              className="btn btn-sm btn-outline-light"
+              className="btn btn-sm btn-primary"
               onClick={this.handleRunCode}
             >
               Run &gt;
@@ -328,7 +331,7 @@ class ValidRoom extends React.Component {
             <button
               type="button"
               id="submit-code"
-              className="btn btn-sm btn-outline-light position-absolute"
+              className="btn btn-sm btn-primary position-absolute"
               onMouseUp={this.handleSubmitCode}
             >
               Submit
@@ -339,11 +342,14 @@ class ValidRoom extends React.Component {
             theme="monokai"
             name="amplify-code-editor"
             placeholder='console.log("hello world!");'
-            width="auto"
-            // value=""
-            className="col-8"
+            width="100vw"
             ref={this.aceEditor}
             editorProps={{ $blockScrolling: true }}
+            setOptions={{
+              enableBasicAutocompletion: true,
+              enableLiveAutocompletion: true,
+              enableSnippets: true,
+            }}
           />
           <pre id="console" className="col-4 pl-1">
             &raquo;{' '}

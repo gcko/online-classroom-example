@@ -47,25 +47,14 @@ function Classroom({ ws }) {
       }
       // adding some time to view the message as it shows for only a brief second without it.
       await resolveAfterNSeconds(3);
-      setRoom(newRoom);
-      setIsValid(!!newRoom && !!newRoom.id && !isRoleFilled);
+      setRoom(() => newRoom);
+      setIsValid(() => !!newRoom && !!newRoom.id && !isRoleFilled);
     }
     fetchData();
   }, [roomId, role]);
 
   if (isValid === true) {
-    return (
-      <>
-        <ValidRoom room={room} role={role} key={ws} />
-        <Routes>
-          <Route path=":roomId" element={<Classroom />} />
-          <Route
-            path=":roomId/:role"
-            element={<ValidRoom room={room} role={role} key={ws} />}
-          />
-        </Routes>
-      </>
-    );
+    return <ValidRoom room={room} role={role} key={ws} />;
   }
   if (isValid === false) {
     return (
@@ -86,9 +75,8 @@ function Classroom({ ws }) {
         </p>
       </Modal>
       <Routes>
-        <Route path=":roomId" element={<Classroom />} />
         <Route
-          path=":roomId/:role"
+          path=":roomId/:role/*"
           element={<ValidRoom room={room} role={role} key={ws} />}
         />
       </Routes>

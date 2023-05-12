@@ -22,6 +22,7 @@ function Main() {
     wsPointer.onopen = () => {
       setWs(wsPointer);
       // reset the timeout on open of a new connection
+      console.log('websocket Connected!');
       timeout.current = 250;
       clearInterval(connectInterval.current);
     };
@@ -49,12 +50,15 @@ function Main() {
       // can point directly to the websocket in this instance
       ws.close();
     };
+    wsPointer.onmessage = (msg) => {
+      console.log('WebSocket Message: ', msg);
+    };
   }
 
   useEffect(() => {
     websocketConnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // passing an empty dependency array ensures it is only called once, equivalent of compenentDidMount
+  }, []); // passing an empty dependency array ensures it is only called once, equivalent of componentDidMount
 
   function check() {
     if (!ws || ws.readyState === WebSocket.CLOSED) {
@@ -65,10 +69,9 @@ function Main() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Lobby ws={ws} key={ws} />} />
+        <Route path="*" element={<Lobby ws={ws} key={ws} />} />
         {/* catch routing to base path as well */}
-        <Route path="/room/:roomId" element={<Classroom ws={ws} />} />
-        <Route path="/room/:roomId/:role" element={<Classroom ws={ws} />} />
+        <Route path="/room/:roomId/:role/*" element={<Classroom ws={ws} />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
       </Routes>
     </BrowserRouter>
