@@ -22,7 +22,6 @@ function Main() {
     wsPointer.onopen = () => {
       setWs(wsPointer);
       // reset the timeout on open of a new connection
-      console.log('websocket Connected!');
       timeout.current = 250;
       clearInterval(connectInterval.current);
     };
@@ -49,9 +48,6 @@ function Main() {
       );
       // can point directly to the websocket in this instance
       ws.close();
-    };
-    wsPointer.onmessage = (msg) => {
-      console.log('WebSocket Message: ', msg);
     };
   }
 

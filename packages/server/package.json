@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint '**/*.js'",
     "start": "nodemon src/index.js",
-    "test": "jest"
+    "test": "NODE_ENV=test jest"
   },
   "dependencies": {
     "body-parser": "^1.20.2",
@@ -23,7 +23,6 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-prettier": "^4.2.1",
-    "lerna": "^6.6.2",
     "nodemon": "^2.0.22",
     "supertest": "^6.3.3"
   }

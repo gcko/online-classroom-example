@@ -25,10 +25,15 @@ app.use(['/api/rooms', '/api/submissions'], (req, res, next) => {
 
 // Initialize Websocket server
 // eslint-disable-next-line no-unused-vars
-const websocketService = new WebsocketService({
-  roomService,
-  submissionService,
-});
+if (
+  !process.env.NODE_ENV ||
+  (process.env.NODE_ENV && process.env.NODE_ENV !== 'test')
+) {
+  const websocketService = new WebsocketService({
+    roomService,
+    submissionService,
+  });
+}
 
 app.use(express.json());
 
