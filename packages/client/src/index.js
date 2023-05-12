@@ -67,7 +67,8 @@ function Main() {
       <Routes>
         <Route path="/" element={<Lobby ws={ws} key={ws} />} />
         {/* catch routing to base path as well */}
-        <Route path="/room/*" element={<Classroom />} />
+        <Route path="/room/:roomId" element={<Classroom ws={ws} />} />
+        <Route path="/room/:roomId/:role" element={<Classroom ws={ws} />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
       </Routes>
     </BrowserRouter>

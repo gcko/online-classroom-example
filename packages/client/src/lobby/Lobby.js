@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Route, Routes } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import {
   ChevronBarRight,
@@ -10,6 +10,26 @@ import pluralize from 'pluralize';
 import './Lobby.sass';
 import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
 import Layout from '../Layout';
+import ValidRoom from '../classroom/ValidClassroom';
+
+function getRoomAttendance(r) {
+  return r.attendance;
+}
+function isRoleFull(room, attendee) {
+  const attendance = getRoomAttendance(room);
+  // eslint-disable-next-line no-restricted-syntax
+  for (const element of attendance) {
+    if (element.name === attendee) {
+      return element.amount > 0;
+    }
+  }
+  // the role wasn't found!
+  return -1;
+}
+
+function isClassFull(room) {
+  return isRoleFull(room, ROLE_STUDENT) && isRoleFull(room, ROLE_INSTRUCTOR);
+}
 
 function Tooltip(props) {
   return (
@@ -17,6 +37,64 @@ function Tooltip(props) {
       <div className="arrow" />
       <div className="tooltip-inner">{props.children}</div>
     </div>
+  );
+}
+
+function WaitingArea({ theRoom, room, role, ws }) {
+  if (isClassFull(theRoom || room)) {
+    return (
+      <>
+        <Link
+          to="/"
+          role="button"
+          aria-disabled="true"
+          className="btn btn-outline-secondary disabled col-2"
+          title="class is full!"
+        >
+          <XCircleFill />
+        </Link>
+        <Tooltip>
+          The class is full! Please wait for space to become available.
+        </Tooltip>
+      </>
+    );
+  }
+  if (isRoleFull(theRoom || room, role)) {
+    return (
+      <>
+        <Link
+          to="/"
+          role="button"
+          aria-disabled="true"
+          className="btn btn-outline-secondary disabled col-2"
+          title="class is full!"
+        >
+          <XCircleFill />
+        </Link>
+        <Tooltip>
+          There is already one {role} in the class, please wait for space to
+          become available.
+        </Tooltip>
+      </>
+    );
+  }
+  return (
+    <>
+      <Link
+        to={`/room/${(theRoom || room).id}/${role}`}
+        role="button"
+        className="btn btn-outline-secondary col-2"
+        title="Go to class!"
+      >
+        <ChevronBarRight />
+      </Link>
+      <Routes>
+        <Route
+          path="/room/:roomId/:role"
+          element={<ValidRoom room={room} role={role} ws={ws} key={ws} />}
+        />
+      </Routes>
+    </>
   );
 }
 
@@ -72,82 +150,20 @@ function EnabledCardContents({ room, role, ws }) {
         currentWs.current = ws;
       }
     };
-  }); // See if it works if we only call once...
-
-  function getRoomAttendance() {
-    const ARoom = theRoom || room;
-    return ARoom.attendance;
-  }
-
-  function isRoleFull(attendee = role) {
-    const attendance = getRoomAttendance();
-    // eslint-disable-next-line no-restricted-syntax
-    for (const element of attendance) {
-      if (element.name === attendee) {
-        return element.amount > 0;
-      }
-    }
-    // the role wasn't found!
-    return -1;
-  }
-
-  function isClassFull() {
-    return isRoleFull(ROLE_STUDENT) && isRoleFull(ROLE_INSTRUCTOR);
-  }
+  });
 
   return (
     <div className="card-body row align-items-center">
       <div className="card-text col-10 mb-0">
         <p>{(theRoom || room).name}</p>
-        {getRoomAttendance().map((attendee) => (
+        {getRoomAttendance(theRoom || room).map((attendee) => (
           <small key={attendee.name} className="d-block">
             {attendee.amount}{' '}
             {pluralize(attendee.label, parseInt(attendee.amount, 10))}
           </small>
         ))}
       </div>
-      {/* eslint-disable-next-line no-nested-ternary */}
-      {isClassFull() ? (
-        <>
-          <Link
-            to="/"
-            role="button"
-            aria-disabled="true"
-            className="btn btn-outline-secondary disabled col-2"
-            title="class is full!"
-          >
-            <XCircleFill />
-          </Link>
-          <Tooltip>
-            The class is full! Please wait for space to become available.
-          </Tooltip>
-        </>
-      ) : isRoleFull() ? (
-        <>
-          <Link
-            to="/"
-            role="button"
-            aria-disabled="true"
-            className="btn btn-outline-secondary disabled col-2"
-            title="class is full!"
-          >
-            <XCircleFill />
-          </Link>
-          <Tooltip>
-            There is already one {role} in the class, please wait for space to
-            become available.
-          </Tooltip>
-        </>
-      ) : (
-        <Link
-          to={`/room/${(theRoom || room).id}/${role}`}
-          role="button"
-          className="btn btn-outline-secondary col-2"
-          title="Go to class!"
-        >
-          <ChevronBarRight />
-        </Link>
-      )}
+      <WaitingArea theRoom={theRoom} room={room} role={role} ws={ws} />
     </div>
   );
 }

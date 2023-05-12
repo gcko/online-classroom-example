@@ -9,11 +9,11 @@
   "scripts": {
     "lint": "lerna run --parallel lint",
     "start": "lerna run --parallel start",
-    "start:client": "npm start --workspace client",
-    "start:server": "npm start --workspace server",
+    "start:client": "npm start --workspace packages/client",
+    "start:server": "npm start --workspace packages/server",
     "test": "npm run test:client && npm run test:server",
-    "test:client": "npm run test --watchAll=false --workspace client ",
-    "test:server": "npm run test --workspace server"
+    "test:client": "npm run test --watchAll=false --workspace packages/client ",
+    "test:server": "npm run test --workspace packages/server"
   },
   "devDependencies": {
     "eslint": "^8.40.0",

@@ -1,5 +1,4 @@
-const bodyParser = require('body-parser');
-const app = require('express')();
+const express = require('express');
 const routes = require('./routes');
 const models = require('./models');
 const {
@@ -7,6 +6,8 @@ const {
   SubmissionService,
   WebsocketService,
 } = require('./services');
+
+const app = express();
 
 const { rooms, submissions } = models;
 
@@ -29,7 +30,7 @@ const websocketService = new WebsocketService({
   submissionService,
 });
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.get('/', (req, res) => {
   res.redirect(301, '/api');

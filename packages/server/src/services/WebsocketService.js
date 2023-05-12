@@ -3,18 +3,20 @@ const WebSocket = require('ws');
 class WebsocketService {
   constructor(config = {}) {
     const { roomService, submissionService } = config;
-    this.isAlive = false; // todo check
+    this.isAlive = false;
     // Initialize the Websocket server
     const wss = new WebSocket.Server({ port: 3334 });
     this.wss = wss;
 
-    function noop() {}
+    function noop() {
+      /* noop */
+    }
 
     function heartbeat() {
       this.isAlive = true;
     }
 
-    wss.on('connection', function connection(ws) {
+    wss.on('connection', (ws) => {
       // eslint-disable-next-line no-param-reassign
       ws.isAlive = true;
       ws.on('pong', heartbeat);
@@ -37,8 +39,8 @@ class WebsocketService {
       roomService.on('change:attendance', handleAttendance);
     });
     // Terminate connections that are no longer alive
-    const interval = setInterval(function ping() {
-      wss.clients.forEach(function each(ws) {
+    const interval = setInterval(() => {
+      wss.clients.forEach((ws) => {
         if (ws.isAlive === false) {
           return ws.terminate();
         }
@@ -48,7 +50,7 @@ class WebsocketService {
       });
     }, 5000);
 
-    wss.on('close', function close() {
+    wss.on('close', () => {
       clearInterval(interval);
     });
   }

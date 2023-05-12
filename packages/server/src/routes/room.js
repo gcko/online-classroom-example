@@ -72,9 +72,7 @@ const router = Router();
  *                    ]
  */
 
-router.get('/', (req, res) => {
-  return res.send(req.services.room.getRooms());
-});
+router.get('/', (req, res) => res.send(req.services.room.getRooms()));
 
 /**
  * @swagger
@@ -242,13 +240,12 @@ router.put('/:roomId', (req, res) => {
   if (!status) {
     // Room did not exist
     res.status(404);
-    // return res.send({ error: new Error(`The room ${roomId} does not exist`) });
     return res.send({ error: `Room ${roomId} does not exist` });
   }
   res.send(status);
 });
 
-router.post('/:roomId/:role/decrement', req => {
+router.post('/:roomId/:role/decrement', (req) => {
   const { roomId, role } = req.params;
   req.services.room.decrementRoleAmount(roomId, role);
   // this is for navigator.sendBeacon;

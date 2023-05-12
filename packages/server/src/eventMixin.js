@@ -39,7 +39,7 @@ const eventMixin = {
     }
 
     // call the handlers
-    this._eventHandlers[eventName].forEach(handler =>
+    this._eventHandlers[eventName].forEach((handler) =>
       handler.apply(this, args)
     );
   },
