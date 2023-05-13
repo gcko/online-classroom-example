@@ -1,15 +1,15 @@
 /* eslint-disable no-console,class-methods-use-this */
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Style } from 'react-style-tag';
 import { Helmet } from 'react-helmet';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/webpack-resolver';
-import Modal from '../common/Modal';
 import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
+import './ValidClassroom.scss';
+import Modal from '../common/Modal';
 import Layout from '../Layout';
 
 // Custom Dev Console output
@@ -299,18 +299,6 @@ class ValidRoom extends React.Component {
     return (
       <Layout>
         <div className="classroom row no-gutters">
-          <Style>
-            {`
-        .amplify-app > footer a,
-          .amplify-app > footer a,
-          .amplify-app > footer a:visited,
-          .amplify-app > footer a:hover,
-          .amplify-app > footer a:link,
-          .amplify-app > footer span {
-          color: #FFEFFF;
-        }
-      `}
-          </Style>
           <Helmet>
             <title>{`${this.room?.name} | Amplify`}</title>
           </Helmet>

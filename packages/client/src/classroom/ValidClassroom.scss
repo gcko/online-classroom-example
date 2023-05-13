@@ -1,0 +1,11 @@
+.amplify-app > footer {
+  a {
+    color: #FFEFFF;
+    &:visited, &:hover, &:link {
+      color: #FFEFFF;
+    }
+  }
+  span {
+    color: #FFEFFF;
+  }
+}
