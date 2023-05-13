@@ -25,7 +25,7 @@ test('role: it has a student and instructor select option', () => {
   const options = getAllByRole('option');
   let studentExists = false;
   let instructorExists = false;
-  options.forEach(function each(option) {
+  options.forEach((option) => {
     if (option.value === 'student') {
       studentExists = true;
     }

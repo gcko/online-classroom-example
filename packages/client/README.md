@@ -12,7 +12,7 @@ following:
 
 * [Bootstrap](https://getbootstrap.com/) - A fully featured and modular styling package
  incorporating a number of best practices. It is fairly simple to pick and choose what to use.
- See [current implementation](src/index.sass).
+ See [current implementation](src/index.scss).
 * [React Bootstrap Icons](https://github.com/ismamz/react-bootstrap-icons) - Simple React
  module that allows you to easily add bootstrap icons to React components.
 * [React-Ace](https://github.com/securingsincity/react-ace) - wraps the venerable

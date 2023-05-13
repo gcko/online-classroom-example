@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-target-blank */
 import React from 'react';
 import { Style } from 'react-style-tag';
-import './TermsOfService.sass';
+import './TermsOfService.scss';
 import Layout from '../Layout';
 
 function TermsOfService() {

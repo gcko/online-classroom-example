@@ -7,7 +7,7 @@ import {
   XCircleFill,
 } from 'react-bootstrap-icons';
 import pluralize from 'pluralize';
-import './Lobby.sass';
+import './Lobby.scss';
 import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
 import Layout from '../Layout';
 import ValidRoom from '../classroom/ValidClassroom';
@@ -83,7 +83,7 @@ function WaitingArea({ theRoom, room, role, ws }) {
       <Link
         to={`/room/${(theRoom || room).id}/${role}`}
         role="button"
-        className="btn btn-outline-secondary col-2"
+        className="btn btn-primary col-2"
         title="Go to class!"
       >
         <ChevronBarRight />
@@ -248,7 +248,7 @@ function Lobby(props) {
 
   return (
     <Layout>
-      <div className="lobby">
+      <div className="lobby col-4 mx-auto">
         <Helmet>
           <title>Lobby | Amplify</title>
           <link rel="canonical" href="https://amplifyourskill.com/" />
@@ -260,14 +260,10 @@ function Lobby(props) {
           Below please select your role and enter the room identifier provided
           to you.
         </p>
-        <form
-          className="col-4"
-          onChange={formValidator}
-          onSubmit={(e) => e.preventDefault()}
-        >
-          <div className="form-group">
+        <form onChange={formValidator} onSubmit={(e) => e.preventDefault()}>
+          <div className="form-group mb-3">
             <select
-              className="form-control"
+              className="form-select"
               id="role-select"
               defaultValue="Select a role..."
               required
@@ -277,7 +273,7 @@ function Lobby(props) {
               <option value={ROLE_INSTRUCTOR}>Instructor</option>
             </select>
           </div>
-          <div className="form-group position-relative">
+          <div className="form-group position-relative mb-3">
             <input
               type="text"
               className="form-control"

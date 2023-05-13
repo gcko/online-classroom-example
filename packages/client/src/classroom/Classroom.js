@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
-import './Classroom.sass';
+import './Classroom.scss';
 import Modal from '../common/Modal';
 import ValidRoom from './ValidClassroom';
 import { updateAttendance } from './common';

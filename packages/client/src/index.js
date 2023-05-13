@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
-import './index.sass';
+import './index.scss';
 import * as serviceWorker from './serviceWorker';
 import Lobby from './lobby/Lobby';
 import Classroom from './classroom/Classroom';
