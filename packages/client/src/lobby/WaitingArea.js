@@ -7,12 +7,11 @@ import Tooltip from '../common/Tooltip';
 
 function WaitingArea({ theRoom, room, role, ws }) {
   function isRoleFull(rm, attendee) {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const element of rm.attendance) {
+    rm.attendance.forEach((element) => {
       if (element.name === attendee) {
         return element.amount > 0;
       }
-    }
+    });
     // the role wasn't found!
     return -1;
   }

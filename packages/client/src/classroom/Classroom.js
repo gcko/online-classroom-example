@@ -12,12 +12,11 @@ async function getRoom(roomId) {
 }
 
 function isRoleFull(attendee, attendance) {
-  // eslint-disable-next-line no-restricted-syntax
-  for (const element of attendance) {
+  attendance.forEach((element) => {
     if (element.name === attendee) {
       return parseInt(element.amount, 10) > 0;
     }
-  }
+  });
   // the role wasn't found!
   return -1;
 }

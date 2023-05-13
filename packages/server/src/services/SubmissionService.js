@@ -9,10 +9,9 @@ class SubmissionService {
   getLargestSubmissionId() {
     const keys = Object.keys(this.submissions);
     let maxKey = -1;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const element of keys) {
+    keys.forEach((element) => {
       maxKey = maxKey < element ? element : maxKey;
-    }
+    });
     return maxKey;
   }
 

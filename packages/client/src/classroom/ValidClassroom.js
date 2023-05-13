@@ -30,9 +30,7 @@ function overrideConsole(consoleElement) {
   console.log = function log(...args) {
     let currentLog = '';
     const argsArray = [...args];
-    // eslint-disable-next-line no-restricted-syntax
-    for (const element of argsArray) {
-      const arg = element;
+    argsArray.forEach((arg) => {
       if (typeof arg === 'object') {
         currentLog += `${
           JSON && JSON.stringify ? JSON.stringify(arg, undefined, 2) : arg
@@ -40,7 +38,8 @@ function overrideConsole(consoleElement) {
       } else {
         currentLog += `${arg} `;
       }
-    }
+    });
+
     // for (const arg of args) {}
     // add the console prompt
     currentLog += `\r\n» `;
@@ -100,16 +99,14 @@ function sandboxEval(codeEl) {
     const args = []; // the local variables
 
     const keys = Object.keys(limitedGlobals);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const element of keys) {
-      const param = element;
+    keys.forEach((param) => {
       // console.log(`param: ${param}`);
       // eslint-disable-next-line no-prototype-builtins
       if (Object.prototype.hasOwnProperty.call(limitedGlobals, param)) {
         args.push(limitedGlobals[param]);
         params.push(param);
       }
-    }
+    });
     // create the parameter list for the sandbox
     let context = Array.prototype.concat.call(thatContext, params, code);
     // create the sandbox function

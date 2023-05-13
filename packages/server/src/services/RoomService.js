@@ -9,11 +9,10 @@ class RoomService {
   getRooms() {
     // return rooms as a simple array of objects
     const rooms = [];
-    // eslint-disable-next-line no-restricted-syntax
-    for (const element of Object.keys(this.rooms)) {
+    Object.keys(this.rooms).forEach((element) => {
       // push the room at a specific key to the simple array
       rooms.push(this.rooms[element]);
-    }
+    });
     return rooms;
   }
 
@@ -58,14 +57,9 @@ class RoomService {
   decrementRoleAmount(roomId, role) {
     const room = this.getRoom(roomId);
     if ('attendance' in room) {
-      const att = room.attendance;
-      // find the role, set the amount to 0
-      // eslint-disable-next-line no-restricted-syntax
-      for (const element of att) {
-        if (element.name === role) {
-          element.amount = 0;
-        }
-      }
+      room.attendance = room.attendance.map((item) =>
+        item.name === role ? 0 : item.amount
+      );
       this.trigger('change:attendance', room);
     }
   }
