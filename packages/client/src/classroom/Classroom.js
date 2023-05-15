@@ -12,13 +12,11 @@ async function getRoom(roomId) {
 }
 
 function isRoleFull(attendee, attendance) {
-  attendance.forEach((element) => {
-    if (element.name === attendee) {
-      return parseInt(element.amount, 10) > 0;
-    }
-  });
-  // the role wasn't found!
-  return -1;
+  return (
+    attendance.filter(
+      (element) => element.name === attendee && element.amount > 0
+    ) > 0
+  );
 }
 
 function resolveAfterNSeconds(num) {

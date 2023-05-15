@@ -49,7 +49,7 @@ function EnabledCardContents({ room, role, ws }) {
           </small>
         ))}
       </div>
-      <WaitingArea theRoom={theRoom} room={room} role={role} ws={ws} />
+      <WaitingArea room={theRoom || room} role={role} ws={ws} />
     </div>
   );
 }

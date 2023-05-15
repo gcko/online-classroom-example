@@ -5,22 +5,20 @@ import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
 import ValidRoom from '../classroom/ValidClassroom';
 import Tooltip from '../common/Tooltip';
 
-function WaitingArea({ theRoom, room, role, ws }) {
+function WaitingArea({ room, role, ws }) {
   function isRoleFull(rm, attendee) {
-    rm.attendance.forEach((element) => {
-      if (element.name === attendee) {
-        return element.amount > 0;
-      }
-    });
-    // the role wasn't found!
-    return -1;
+    return (
+      rm.attendance.filter(
+        (element) => element.name === attendee && element.amount > 0
+      ) > 0
+    );
   }
 
   function isClassFull(rm) {
     return isRoleFull(rm, ROLE_STUDENT) && isRoleFull(rm, ROLE_INSTRUCTOR);
   }
 
-  if (isClassFull(theRoom || room)) {
+  if (isClassFull(room)) {
     return (
       <>
         <Link
@@ -38,7 +36,7 @@ function WaitingArea({ theRoom, room, role, ws }) {
       </>
     );
   }
-  if (isRoleFull(theRoom || room, role)) {
+  if (isRoleFull(room, role)) {
     return (
       <>
         <Link
@@ -60,7 +58,7 @@ function WaitingArea({ theRoom, room, role, ws }) {
   return (
     <>
       <Link
-        to={`/room/${(theRoom || room).id}/${role}`}
+        to={`/room/${room.id}/${role}`}
         role="button"
         className="btn btn-primary col-2"
         title="Go to class!"

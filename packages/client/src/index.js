@@ -42,6 +42,11 @@ function Main() {
       );
     };
 
+    wsPointer.onmessage = (ev) => {
+      // eslint-disable-next-line no-console
+      console.info('WebSocket Message: ', ev);
+    };
+
     wsPointer.onerror = (err) => {
       console.error(
         `Websocket encountered an error: ${err.message}, Closing socket.`

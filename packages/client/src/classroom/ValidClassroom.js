@@ -299,7 +299,7 @@ class ValidRoom extends React.Component {
           <Helmet>
             <title>{`${this.room?.name} | Amplify`}</title>
           </Helmet>
-          <div className="run-code-wrapper position-absolute">
+          <div className="run-code-wrapper d-flex align-items-center justify-content-center">
             <button
               type="button"
               id="run-code"
@@ -308,7 +308,7 @@ class ValidRoom extends React.Component {
             >
               Run &gt;
             </button>
-            <small className="text-white font-italic ml-1">
+            <small className="text-white font-italic ms-3">
               Or press ctrl-enter to run
             </small>
           </div>
@@ -316,7 +316,7 @@ class ValidRoom extends React.Component {
             <button
               type="button"
               id="submit-code"
-              className="btn btn-sm btn-primary position-absolute"
+              className="btn btn-sm btn-primary"
               onMouseUp={this.handleSubmitCode}
             >
               Submit
@@ -327,7 +327,7 @@ class ValidRoom extends React.Component {
             theme="monokai"
             name="amplify-code-editor"
             placeholder='console.log("hello world!");'
-            width="100vw"
+            width="50vw"
             ref={this.aceEditor}
             editorProps={{ $blockScrolling: true }}
             setOptions={{
