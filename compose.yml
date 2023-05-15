@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    platform: linux/amd64
+    # platform: linux/amd64
     restart: unless-stopped
     command: ["npm", "run", "start:client"]
     ports:
@@ -17,7 +17,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    platform: linux/amd64
+    # platform: linux/amd64
     restart: unless-stopped
     command: ["npm", "run", "start:server"]
     ports:
