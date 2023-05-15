@@ -25,7 +25,7 @@
   },
   "scripts": {
     "lint": "eslint '**/*.js'",
-    "start": "react-scripts start --no-cache",
+    "start": "HOST=0.0.0.0 react-scripts start --no-cache",
     "build": "react-scripts build",
     "test": "react-scripts test --no-cache",
     "eject": "react-scripts eject"

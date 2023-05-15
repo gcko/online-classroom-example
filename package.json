@@ -9,6 +9,8 @@
   "scripts": {
     "lint": "nx run-many -t lint",
     "start": "nx run-many -t start",
+    "start:client": "nx run @classroom/client:start",
+    "start:server": "nx run @classroom/server:start",
     "test": "nx run-many -t test"
   },
   "devDependencies": {
