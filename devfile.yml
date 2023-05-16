@@ -10,40 +10,40 @@ components:
   - name: fullstack
     container:
       image: node:20
-      memoryLimit: 1024Mi
+      # memoryLimit: 1024Mi
       mountSources: true
-      endpoints:
-      - name: web
-        targetPort: 3000
-        exposure: public
-      - name: http
-        targetPort: 3333
-        exposure: public
-      - name: websocket
-        targetPort: 3334
-        exposure: public
-commands:
-  - id: install
-    exec:
-      component: fullstack
-      commandLine: npm install
-      workingDir: ${PROJECT_SOURCE}
-      group:
-        kind: build
-        isDefault: true
-  - id: run
-    exec:
-      component: fullstack
-      commandLine: npm start
-      workingDir: ${PROJECT_SOURCE}
-      group:
-        kind: run
-        isDefault: true
-  - id: test
-    exec:
-      component: fullstack
-      commandLine: npm test
-      workingDir: ${PROJECT_SOURCE}
-      group:
-        kind: test
-        isDefault: true
+      # endpoints:
+      # - name: web
+      #   targetPort: 3000
+      #   exposure: public
+      # - name: http
+      #   targetPort: 3333
+      #   exposure: public
+      # - name: websocket
+      #   targetPort: 3334
+      #   exposure: public
+# commands:
+#   - id: install
+#     exec:
+#       component: fullstack
+#       commandLine: npm install
+#       workingDir: ${PROJECT_SOURCE}
+#       group:
+#         kind: build
+#         isDefault: true
+#   - id: run
+#     exec:
+#       component: fullstack
+#       commandLine: npm start
+#       workingDir: ${PROJECT_SOURCE}
+#       group:
+#         kind: run
+#         isDefault: true
+#   - id: test
+#     exec:
+#       component: fullstack
+#       commandLine: npm test
+#       workingDir: ${PROJECT_SOURCE}
+#       group:
+#         kind: test
+#         isDefault: true
