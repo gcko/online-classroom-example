@@ -10,8 +10,8 @@ components:
   - name: fullstack
     container:
       image: node:20
+      memoryLimit: 1024Mi
       mountSources: true
-      command: ['npm', 'install']
       endpoints:
       - name: web
         targetPort: 3000
@@ -22,5 +22,36 @@ components:
       - name: websocket
         targetPort: 3334
         exposure: public
-      
-# $(PROJECTS_ROOT)
+commands:
+  - id: install
+    exec:
+      component: fullstack
+      commandLine: npm install
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: build
+        isDefault: true
+  - id: run
+    exec:
+      component: fullstack
+      commandLine: npm start
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: run
+        isDefault: true
+  - id: test
+    exec:
+      component: fullstack
+      commandLine: npm test
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: test
+        isDefault: true
+  - id: lint
+    exec:
+      component: fullstack
+      commandLine: npm run lint
+      workingDir: ${PROJECT_SOURCE}
+      group:
+        kind: test
+        isDefault: true
