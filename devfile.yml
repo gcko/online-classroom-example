@@ -47,11 +47,3 @@ commands:
       group:
         kind: test
         isDefault: true
-  - id: lint
-    exec:
-      component: fullstack
-      commandLine: npm run lint
-      workingDir: ${PROJECT_SOURCE}
-      group:
-        kind: test
-        isDefault: true
