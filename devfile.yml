@@ -1,0 +1,26 @@
+schemaVersion: 2.2.0
+metadata:
+  name: online-classroom-devfile
+projects:
+  - name: online-classroom
+    git:
+      remotes:
+        origin: "https://codegiant.io/gcko/gcko/online-classroom.git"
+components:
+  - name: fullstack
+    container:
+      image: node:20
+      mountSources: true
+      command: ['npm', 'install']
+      endpoints:
+      - name: web
+        targetPort: 3000
+        exposure: public
+      - name: http
+        targetPort: 3333
+        exposure: public
+      - name: websocket
+        targetPort: 3334
+        exposure: public
+      
+# $(PROJECTS_ROOT)
