@@ -6,7 +6,7 @@ projects:
   - name: online-classroom
     git:
       remotes:
-        origin: "https://codegiant.io/gcko/gcko/online-classroom.git"
+        origin: "https://github.com/gcko/online-classroom-example.git"
       checkoutFrom:
         revision: main
 components:
