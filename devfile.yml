@@ -13,18 +13,18 @@ components:
   - name: fullstack
     container:
       image: node:20
-      # memoryLimit: 1024Mi
+      memoryLimit: 2048Mi
       mountSources: true
       endpoints:
-      - name: web
-        targetPort: 3000
-        exposure: public
-      - name: http
-        targetPort: 3333
-        exposure: public
-      - name: websocket
-        targetPort: 3334
-        exposure: public
+        - name: web
+          targetPort: 3000
+          exposure: public
+        - name: http
+          targetPort: 3333
+          exposure: public
+        - name: websocket
+          targetPort: 3334
+          exposure: public
 commands:
   - id: install
     exec:
@@ -39,14 +39,15 @@ commands:
       component: fullstack
       commandLine: npm start
       workingDir: ${PROJECT_SOURCE}
+      hotReloadCapable: true
       group:
         kind: run
         isDefault: true
-  - id: test
-    exec:
-      component: fullstack
-      commandLine: npm test
-      workingDir: ${PROJECT_SOURCE}
-      group:
-        kind: test
-        isDefault: true
+#  - id: test
+#    exec:
+#      component: fullstack
+#      commandLine: npm test
+#      workingDir: ${PROJECT_SOURCE}
+#      group:
+#        kind: test
+#        isDefault: true
