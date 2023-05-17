@@ -30,7 +30,7 @@ commands:
     exec:
       component: fullstack
       commandLine: npm install
-      workingDir: ${PROJECT_SOURCE}
+      workingDir: ${PROJECTS_ROOT}/online-classroom
       group:
         kind: build
         isDefault: true
@@ -38,7 +38,7 @@ commands:
     exec:
       component: fullstack
       commandLine: npm start
-      workingDir: ${PROJECT_SOURCE}
+      workingDir: ${PROJECTS_ROOT}/online-classroom
       hotReloadCapable: true
       group:
         kind: run
