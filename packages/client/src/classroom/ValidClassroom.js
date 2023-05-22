@@ -1,5 +1,5 @@
 /* eslint-disable no-console,class-methods-use-this */
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import AceEditor from 'react-ace';
@@ -161,196 +161,195 @@ async function getSubmission(roomId) {
   return response.json();
 }
 
-async function onUnmount() {
+async function onUnmountWithParams(roomId, role) {
   // Decrement attendance
   // Use Navigator beacon so that even on tab/browser close it will fire
-  navigator.sendBeacon(`/api/rooms/${this.room.id}/${this.role}/decrement`);
+  navigator.sendBeacon(`/api/rooms/${roomId}/${role}/decrement`);
 }
 
-class ValidRoom extends React.Component {
-  constructor(props) {
-    super(props);
-    this.aceEditor = React.createRef();
-    this.role = this.props.role;
-    this.room = this.props.room;
-    this.state = {
-      hasSubmission: false,
-    };
-    this.ws = this.props.ws;
-    this.defaultLog = console.log;
-    this.defaultWarn = console.warn;
-    this.defaultError = console.error;
-    this.defaultClear = console.clear;
-    this.boundOnUnmount = onUnmount.bind(this, false);
-  }
+const handleRunCode = () => {
+  const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
+  sandboxEval(editorTextEl);
+};
 
-  async componentDidMount() {
-    window.addEventListener('beforeunload', this.boundOnUnmount, false);
-    if (this.role === ROLE_INSTRUCTOR) {
-      if (this.room.submissionId) {
-        // Show the submitted code
-        const submission = await getSubmission(this.room.id);
-        this.setState({ hasSubmission: true });
-        this.aceEditor.current.editor.insert(submission.text);
-      } else {
-        // no code has been submitted yet, show a notification
-        this.setState({ hasSubmission: false });
+const waitNSeconds = (num) => {
+  const seconds = num * 1000;
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('resolved');
+    }, seconds);
+  });
+};
+
+const changeToSubmitAfterNSeconds = (num) => {
+  const seconds = num * 1000;
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      if (document.getElementById('submit-code')) {
+        // only operate if the element is still around
+        document.getElementById('submit-code').innerText = 'Submit';
       }
-      // setup listener only for Instructor
-      if (this.ws) {
-        this.ws.addEventListener('message', this.handleWebsocketMessage);
-      }
-    }
-    handleKeyboardShortcuts(true);
-    // Override console *after* creating a sandbox around eval
-    overrideConsole(document.getElementById('console'));
-  }
+      resolve('resolved');
+    }, seconds);
+  });
+};
 
-  // eslint-disable-next-line no-unused-vars
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.ws !== this.props.ws) {
-      console.log('Websocket has been updated! Refreshing current websocket');
-      this.ws.removeEventListener('message', this.handleWebsocketMessage);
-      this.ws = this.props.ws;
-      this.ws.addEventListener('message', this.handleWebsocketMessage);
-    }
-  }
-
-  async componentWillUnmount() {
-    window.removeEventListener('beforeunload', this.boundOnUnmount, false);
-    this.boundOnUnmount();
-    // remove override
-    console.log = this.defaultLog;
-    console.warn = this.defaultWarn;
-    console.error = this.defaultError;
-    console.clear = this.defaultClear;
-    handleKeyboardShortcuts(false);
-    if (this.ws) {
-      this.ws.removeEventListener('message', this.handleWebsocketMessage);
-    }
-  }
-
-  handleWebsocketMessage = (e) => {
-    try {
-      const msg = JSON.parse(e.data);
-      // only submit submission changes on the instructor view
-      if (msg.event === 'change:submission') {
-        this.setState({ hasSubmission: true });
-        this.aceEditor.current.editor.selectAll();
-        this.aceEditor.current.editor.insert(msg.data.text);
-      }
-    } catch (error) {
-      console.warn(`Message was not JSON parsable. resp: ${e.data}`);
-      console.warn(`Error: ${error}`);
-    }
+const handleSubmitCode = async (room) => {
+  const body = {
+    roomId: room.id,
+    submission: document.getElementsByClassName('ace_text-layer')[0].innerText,
   };
+  document.getElementById('submit-code').innerText = 'Submitting...';
+  await waitNSeconds(2);
+  const response = await fetch(`/api/submissions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  await response.json();
+  document.getElementById('submit-code').innerText = 'Submitted!';
+  await changeToSubmitAfterNSeconds(2);
+};
 
-  handleRunCode = () => {
-    const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
-    sandboxEval(editorTextEl);
-  };
-
-  waitNSeconds = (num) => {
-    const seconds = num * 1000;
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve('resolved');
-      }, seconds);
-    });
-  };
-
-  changeToSubmitAfterNSeconds = (num) => {
-    const seconds = num * 1000;
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (document.getElementById('submit-code')) {
-          // only operate if the element is still around
-          document.getElementById('submit-code').innerText = 'Submit';
+// Convert ValidRoom to a functional component
+function ValidRoom({ room, role, ws }) {
+  const [hasSubmission, setHasSubmission] = useState(false);
+  const aceEditor = React.createRef();
+  const boundOnUnmount = onUnmountWithParams.bind(undefined, room.id, role);
+  const boundHandleSubmit = handleSubmitCode.bind(undefined, room);
+  const defaultLog = console.log;
+  const defaultWarn = console.warn;
+  const defaultError = console.error;
+  const defaultClear = console.clear;
+  // because this is being used within useEffect, it needs to be cached using useCallback
+  const handleWebsocketMessage = useCallback(
+    (e) => {
+      try {
+        const msg = JSON.parse(e.data);
+        // only submit submission changes on the instructor view
+        if (msg.event === 'change:submission') {
+          setHasSubmission(() => true);
+          aceEditor.current.editor.selectAll();
+          aceEditor.current.editor.insert(msg.data.text);
         }
-        resolve('resolved');
-      }, seconds);
-    });
-  };
-
-  handleSubmitCode = async () => {
-    const body = {
-      roomId: this.room.id,
-      submission:
-        document.getElementsByClassName('ace_text-layer')[0].innerText,
+      } catch (error) {
+        console.warn(`Message was not JSON parsable. resp: ${e.data}`);
+        console.warn(`Error: ${error}`);
+      }
+    },
+    [aceEditor]
+  );
+  // Mirrors componentDidMount
+  useEffect(() => {
+    async function handleAsync() {
+      window.addEventListener('beforeunload', boundOnUnmount, false);
+      if (role === ROLE_INSTRUCTOR) {
+        if (room.submissionId) {
+          // Show the submitted code
+          const submission = await getSubmission(room.id);
+          setHasSubmission(() => true);
+          aceEditor.current.editor.insert(submission.text);
+        } else {
+          // no code has been submitted yet, show a notification
+          setHasSubmission(() => false);
+        }
+        // setup listener only for Instructor
+        if (ws) {
+          ws.addEventListener('message', handleWebsocketMessage);
+        }
+      }
+      handleKeyboardShortcuts(true);
+      // Override console *after* creating a sandbox around eval
+      overrideConsole(document.getElementById('console'));
+    }
+    handleAsync().catch((e) => console.error(e));
+    // Functional way of calling componentWillUnmount
+    return function cleanup() {
+      window.removeEventListener('beforeunload', boundOnUnmount, false);
+      boundOnUnmount();
+      // remove override
+      console.log = defaultLog;
+      console.warn = defaultWarn;
+      console.error = defaultError;
+      console.clear = defaultClear;
+      handleKeyboardShortcuts(false);
+      if (ws) {
+        ws.removeEventListener('message', handleWebsocketMessage);
+      }
     };
-    document.getElementById('submit-code').innerText = 'Submitting...';
-    await this.waitNSeconds(2);
-    const response = await fetch(`/api/submissions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-    await response.json();
-    document.getElementById('submit-code').innerText = 'Submitted!';
-    await this.changeToSubmitAfterNSeconds(2);
-  };
+  }, [
+    aceEditor,
+    boundOnUnmount,
+    defaultClear,
+    defaultError,
+    defaultLog,
+    defaultWarn,
+    handleWebsocketMessage,
+    role,
+    room.id,
+    room.submissionId,
+    ws,
+  ]);
 
-  render() {
-    return (
-      <Layout>
-        <div className="classroom row no-gutters">
-          <Helmet>
-            <title>{`${this.room?.name} | Amplify`}</title>
-          </Helmet>
-          <div className="run-code-wrapper d-flex align-items-center justify-content-center">
-            <button
-              type="button"
-              id="run-code"
-              className="btn btn-sm btn-primary"
-              onClick={this.handleRunCode}
-            >
-              Run &gt;
-            </button>
-            <small className="text-white font-italic ms-3">
-              Or press ctrl-enter to run
-            </small>
-          </div>
-          {ROLE_STUDENT === this.role && (
-            <button
-              type="button"
-              id="submit-code"
-              className="btn btn-sm btn-primary"
-              onMouseUp={this.handleSubmitCode}
-            >
-              Submit
-            </button>
-          )}
-          <AceEditor
-            mode="javascript"
-            theme="monokai"
-            name="amplify-code-editor"
-            placeholder='console.log("hello world!");'
-            width="50vw"
-            ref={this.aceEditor}
-            editorProps={{ $blockScrolling: true }}
-            setOptions={{
-              enableBasicAutocompletion: true,
-              enableLiveAutocompletion: true,
-              enableSnippets: true,
-            }}
-          />
-          <pre id="console" className="col-4 pl-1">
-            &raquo;{' '}
-          </pre>
-          {!this.state.hasSubmission && ROLE_INSTRUCTOR === this.role && (
-            <Modal title="Wait for submission">
-              <p>No submission has been made yet. Please wait...</p>
-              <p>
-                Go back to the <Link to="/">Lobby</Link>.
-              </p>
-            </Modal>
-          )}
+  return (
+    <Layout>
+      <div className="classroom row no-gutters">
+        <Helmet>
+          <title>{`${room?.name} | Amplify`}</title>
+        </Helmet>
+        <div className="run-code-wrapper d-flex align-items-center justify-content-center">
+          <button
+            type="button"
+            id="run-code"
+            className="btn btn-sm btn-primary"
+            onClick={handleRunCode}
+          >
+            Run &gt;
+          </button>
+          <small className="text-white font-italic ms-3">
+            Or press ctrl-enter to run
+          </small>
         </div>
-      </Layout>
-    );
-  }
+        {ROLE_STUDENT === role && (
+          <button
+            type="button"
+            id="submit-code"
+            className="btn btn-sm btn-primary"
+            onMouseUp={boundHandleSubmit}
+          >
+            Submit
+          </button>
+        )}
+        <AceEditor
+          mode="javascript"
+          theme="monokai"
+          name="amplify-code-editor"
+          placeholder='console.log("hello world!");'
+          width="50vw"
+          ref={aceEditor}
+          editorProps={{ $blockScrolling: true }}
+          setOptions={{
+            enableBasicAutocompletion: true,
+            enableLiveAutocompletion: true,
+            enableSnippets: true,
+          }}
+        />
+        <pre id="console" className="col-4 pl-1">
+          &raquo;{' '}
+        </pre>
+        {!hasSubmission && ROLE_INSTRUCTOR === role && (
+          <Modal title="Wait for submission">
+            <p>No submission has been made yet. Please wait...</p>
+            <p>
+              Go back to the <Link to="/">Lobby</Link>.
+            </p>
+          </Modal>
+        )}
+      </div>
+    </Layout>
+  );
 }
 
 export default ValidRoom;

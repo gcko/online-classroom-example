@@ -51,7 +51,7 @@ function Classroom({ ws }) {
   }, [roomId, role]);
 
   if (isValid === true) {
-    return <ValidRoom room={room} role={role} key={ws} />;
+    return <ValidRoom room={room} role={role} ws={ws} key={ws} />;
   }
   if (isValid === false) {
     return (
@@ -74,7 +74,7 @@ function Classroom({ ws }) {
       <Routes>
         <Route
           path=":roomId/:role/*"
-          element={<ValidRoom room={room} role={role} key={ws} />}
+          element={<ValidRoom room={room} role={role} ws={ws} key={ws} />}
         />
       </Routes>
     </Layout>
