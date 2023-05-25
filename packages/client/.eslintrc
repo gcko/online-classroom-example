@@ -1,4 +1,9 @@
 {
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  },
   "extends": [
     "react-app",
     "airbnb",
@@ -14,7 +19,7 @@
     "react/jsx-filename-extension": [
       1,
       {
-        "extensions": [".js", ".jsx"]
+        "extensions": [".js", ".jsx", ".tsx"]
       }
     ],
     "react/jsx-props-no-spreading": ["off"],
@@ -26,7 +31,8 @@
         "trailingComma": "es5",
         "tabWidth": 2,
         "semi": true,
-        "singleQuote": true
+        "singleQuote": true,
+        "endOfLine":"auto"
       }
     ]
   }

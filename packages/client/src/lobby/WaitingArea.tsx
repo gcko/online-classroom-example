@@ -1,20 +1,27 @@
 import { Link, Route, Routes } from 'react-router-dom';
 import { ChevronBarRight, XCircleFill } from 'react-bootstrap-icons';
 import React from 'react';
-import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
-import ValidRoom from '../classroom/ValidClassroom';
-import Tooltip from '../common/Tooltip';
+import { Role, Room } from 'src/types.ts';
+import { ROLE_INSTRUCTOR, ROLE_STUDENT } from 'src/common/constants.ts';
+import ValidRoom from 'src/classroom/ValidClassroom.tsx';
+import Tooltip from 'src/common/Tooltip.tsx';
 
-function WaitingArea({ room, role, ws }) {
-  function isRoleFull(rm, attendee) {
+type Props = {
+  room: Room;
+  role: Role;
+  ws: WebSocket;
+};
+
+function WaitingArea({ room, role, ws }: Props) {
+  function isRoleFull(rm: Room, attendee: Role) {
     return (
       rm.attendance.filter(
         (element) => element.name === attendee && element.amount > 0
-      ) > 0
+      ).length > 0
     );
   }
 
-  function isClassFull(rm) {
+  function isClassFull(rm: Room) {
     return isRoleFull(rm, ROLE_STUDENT) && isRoleFull(rm, ROLE_INSTRUCTOR);
   }
 
@@ -31,7 +38,9 @@ function WaitingArea({ room, role, ws }) {
           <XCircleFill />
         </Link>
         <Tooltip>
-          The class is full! Please wait for space to become available.
+          <span>
+            The class is full! Please wait for space to become available.
+          </span>
         </Tooltip>
       </>
     );
@@ -49,8 +58,10 @@ function WaitingArea({ room, role, ws }) {
           <XCircleFill />
         </Link>
         <Tooltip>
-          There is already one {role} in the class, please wait for space to
-          become available.
+          <span>
+            There is already one {role} in the class, please wait for space to
+            become available.
+          </span>
         </Tooltip>
       </>
     );
@@ -68,7 +79,7 @@ function WaitingArea({ room, role, ws }) {
       <Routes>
         <Route
           path="/room/:roomId/:role"
-          element={<ValidRoom room={room} role={role} ws={ws} key={ws} />}
+          element={<ValidRoom room={room} role={role} ws={ws} key={room.id} />}
         />
       </Routes>
     </>

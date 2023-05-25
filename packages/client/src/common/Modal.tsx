@@ -1,8 +1,12 @@
 import React from 'react';
 
-function Modal({ title, children }) {
+type Props = {
+  title: string;
+  children: React.ReactElement;
+};
+function Modal({ title, children }: Props) {
   return (
-    <div className="modal" tabIndex="-1">
+    <div className="modal">
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">

@@ -1,5 +1,11 @@
 // eslint-disable-next-line import/prefer-default-export
-export async function updateAttendance(room, role, entering = true) {
+import { Role, Room } from 'src/types.ts';
+
+export default async function updateAttendance(
+  room: Room,
+  role: Role,
+  entering = true
+) {
   const { attendance } = room;
   for (let i = 0; i < attendance.length; i += 1) {
     if (attendance[i].name === role) {
@@ -13,6 +19,5 @@ export async function updateAttendance(room, role, entering = true) {
     },
     body: JSON.stringify({ attendance }),
   });
-  const json = await response.json();
-  return json;
+  return response.json();
 }

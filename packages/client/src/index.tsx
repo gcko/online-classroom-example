@@ -2,10 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import './index.scss';
-import * as serviceWorker from './serviceWorker';
-import Lobby from './lobby/Lobby';
-import Classroom from './classroom/Classroom';
-import TermsOfService from './support/TermsOfService';
+import Lobby from 'src/lobby/Lobby.tsx';
+import Classroom from 'src/classroom/Classroom.tsx';
+import TermsOfService from './support/TermsOfService.tsx';
 
 function Main() {
   // Setup WebSockets
@@ -35,7 +34,7 @@ function Main() {
         e.reason
       );
       timeout.current += timeout.current;
-      connectInterval.current = setTimeout(
+      connectInterval.current = window.setTimeout(
         // eslint-disable-next-line no-use-before-define
         check,
         Math.min(10000, timeout.current)
@@ -48,9 +47,7 @@ function Main() {
     };
 
     wsPointer.onerror = (err) => {
-      console.error(
-        `Websocket encountered an error: ${err.message}, Closing socket.`
-      );
+      console.error(`Websocket encountered an error, Closing socket: `, err);
       // can point directly to the websocket in this instance
       ws.close();
     };
@@ -70,7 +67,7 @@ function Main() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="*" element={<Lobby ws={ws} key={ws} />} />
+        <Route path="*" element={<Lobby ws={ws} />} />
         {/* catch routing to base path as well */}
         <Route path="/room/:roomId/:role/*" element={<Classroom ws={ws} />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
@@ -79,9 +76,5 @@ function Main() {
   );
 }
 
-createRoot(document.getElementById('root')).render(<Main />);
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+const rootElement = document.getElementById('root') as HTMLElement;
+createRoot(rootElement).render(<Main />);

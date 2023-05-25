@@ -7,15 +7,16 @@ import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/webpack-resolver';
-import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
+import { Role, Room } from 'src/types.ts';
+import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants.ts';
 import './ValidClassroom.scss';
-import Modal from '../common/Modal';
-import Layout from '../Layout';
+import Modal from '../common/Modal.tsx';
+import Layout from '../Layout.tsx';
 
 // Custom Dev Console output
 // https://github.com/iambenkay/js-ide/blob/master/index.html
-function overrideConsole(consoleElement) {
-  function appendMessage(text) {
+function overrideConsole(consoleElement: HTMLElement) {
+  function appendMessage(text: string) {
     const span = document.createElement('span');
     span.className = 'message';
     span.textContent = text;
@@ -89,14 +90,23 @@ function overrideConsole(consoleElement) {
 
 // create our own local versions of window and document with limited functionality.
 // Do it once and before other code executes.
-const sandboxGlobals = {
+interface SandboxContext {
+  [index: string]: Record<string, any>;
+  document: Record<string, any>;
+  window: Record<string, any>;
+}
+const sandboxGlobals: SandboxContext = {
   window: {},
   document: {},
 };
-function sandboxEval(codeEl) {
-  function createSandbox(code, thatContext, limitedGlobals) {
-    const params = []; // the names of local variables
-    const args = []; // the local variables
+function sandboxEval(codeEl: HTMLElement) {
+  function createSandbox(
+    code: string,
+    thatContext: Record<string, any>,
+    limitedGlobals: SandboxContext
+  ) {
+    const params: string[] = []; // the names of local variables
+    const args: Record<string, any>[] = []; // the local variables
 
     const keys = Object.keys(limitedGlobals);
     keys.forEach((param) => {
@@ -108,20 +118,25 @@ function sandboxEval(codeEl) {
       }
     });
     // create the parameter list for the sandbox
-    let context = Array.prototype.concat.call(thatContext, params, code);
+    let context: Record<string, any>[] = Array.prototype.concat.call(
+      thatContext,
+      params,
+      code
+    );
     // create the sandbox function
     try {
-      // eslint-disable-next-line
-      const sandbox = new (Function.prototype.bind.apply(Function, context));
+      // @ts-ignore
+      const sandbox = new (Function.prototype.bind.apply(Function, context))();
       // create the argument list for the sandbox
       context = Array.prototype.concat.call(thatContext, args);
       // bind the local variables to the sandbox
+      // @ts-ignore
       return Function.prototype.bind.apply(sandbox, context);
     } catch (e) {
       console.error(e);
     }
   }
-  const that = Object.create(null); // create our own this object for the user code
+  const that: Record<string, any> = Object.create(null); // create our own this object for the user code
   const userSandbox = createSandbox(codeEl.innerText, that, sandboxGlobals); // create a sandbox
   try {
     userSandbox(); // call the user code in the sandbox
@@ -132,16 +147,21 @@ function sandboxEval(codeEl) {
   }
 }
 
+// @ts-ignore
 function kbdSecondKey(e) {
   if (e.key === 'i') console.clear();
-  const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
+  const editorTextEl = document.getElementsByClassName(
+    'ace_text-layer'
+  )[0] as HTMLElement;
   if (e.key === 'Enter') {
     sandboxEval(editorTextEl);
   }
 }
+// @ts-ignore
 function kbdFirstKey(e) {
   if (e.key === 'Control') window.addEventListener('keydown', kbdSecondKey);
 }
+// @ts-ignore
 function kbuFirstKey(e) {
   if (e.key === 'Control') window.removeEventListener('keydown', kbdSecondKey);
 }
@@ -156,23 +176,25 @@ function handleKeyboardShortcuts(on = true) {
   }
 }
 
-async function getSubmission(roomId) {
+async function getSubmission(roomId: number) {
   const response = await fetch(`/api/rooms/${roomId}/submission`);
   return response.json();
 }
 
-async function onUnmountWithParams(roomId, role) {
+async function onUnmountWithParams(roomId: number, role: Role) {
   // Decrement attendance
   // Use Navigator beacon so that even on tab/browser close it will fire
   navigator.sendBeacon(`/api/rooms/${roomId}/${role}/decrement`);
 }
 
 const handleRunCode = () => {
-  const editorTextEl = document.getElementsByClassName('ace_text-layer')[0];
+  const editorTextEl = document.getElementsByClassName(
+    'ace_text-layer'
+  )[0] as HTMLElement;
   sandboxEval(editorTextEl);
 };
 
-const waitNSeconds = (num) => {
+const waitNSeconds = (num: number) => {
   const seconds = num * 1000;
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -181,25 +203,31 @@ const waitNSeconds = (num) => {
   });
 };
 
-const changeToSubmitAfterNSeconds = (num) => {
+const changeToSubmitAfterNSeconds = (num: number) => {
   const seconds = num * 1000;
   return new Promise((resolve) => {
     setTimeout(() => {
-      if (document.getElementById('submit-code')) {
+      const submitCodeEl = document.getElementById('submit-code');
+      if (submitCodeEl) {
         // only operate if the element is still around
-        document.getElementById('submit-code').innerText = 'Submit';
+        submitCodeEl.innerText = 'Submit';
       }
       resolve('resolved');
     }, seconds);
   });
 };
 
-const handleSubmitCode = async (room) => {
+const handleSubmitCode = async (room: Room) => {
   const body = {
     roomId: room.id,
-    submission: document.getElementsByClassName('ace_text-layer')[0].innerText,
+    submission: (
+      document.getElementsByClassName('ace_text-layer')[0] as HTMLElement
+    ).innerText,
   };
-  document.getElementById('submit-code').innerText = 'Submitting...';
+  let submitCodeEL = document.getElementById('submit-code');
+  if (submitCodeEL) {
+    submitCodeEL.innerText = 'Submitting...';
+  }
   await waitNSeconds(2);
   const response = await fetch(`/api/submissions`, {
     method: 'POST',
@@ -209,14 +237,22 @@ const handleSubmitCode = async (room) => {
     body: JSON.stringify(body),
   });
   await response.json();
-  document.getElementById('submit-code').innerText = 'Submitted!';
+  submitCodeEL = document.getElementById('submit-code');
+  if (submitCodeEL) {
+    submitCodeEL.innerText = 'Submitted!';
+  }
   await changeToSubmitAfterNSeconds(2);
 };
 
+type Props = {
+  room: Room;
+  role: Role;
+  ws: WebSocket;
+};
 // Convert ValidRoom to a functional component
-function ValidRoom({ room, role, ws }) {
+function ValidRoom({ room, role, ws }: Props) {
   const [hasSubmission, setHasSubmission] = useState(false);
-  const aceEditor = React.createRef();
+  const aceEditor: React.RefObject<AceEditor> = React.createRef();
   const boundOnUnmount = onUnmountWithParams.bind(undefined, room.id, role);
   const boundHandleSubmit = handleSubmitCode.bind(undefined, room);
   const defaultLog = console.log;
@@ -225,14 +261,16 @@ function ValidRoom({ room, role, ws }) {
   const defaultClear = console.clear;
   // because this is being used within useEffect, it needs to be cached using useCallback
   const handleWebsocketMessage = useCallback(
-    (e) => {
+    (e: MessageEvent) => {
       try {
         const msg = JSON.parse(e.data);
         // only submit submission changes on the instructor view
         if (msg.event === 'change:submission') {
           setHasSubmission(() => true);
-          aceEditor.current.editor.selectAll();
-          aceEditor.current.editor.insert(msg.data.text);
+          if (aceEditor.current) {
+            aceEditor.current.editor.selectAll();
+            aceEditor.current.editor.insert(msg.data.text);
+          }
         }
       } catch (error) {
         console.warn(`Message was not JSON parsable. resp: ${e.data}`);
@@ -250,7 +288,9 @@ function ValidRoom({ room, role, ws }) {
           // Show the submitted code
           const submission = await getSubmission(room.id);
           setHasSubmission(() => true);
-          aceEditor.current.editor.insert(submission.text);
+          if (aceEditor.current) {
+            aceEditor.current.editor.insert(submission.text);
+          }
         } else {
           // no code has been submitted yet, show a notification
           setHasSubmission(() => false);
@@ -262,13 +302,13 @@ function ValidRoom({ room, role, ws }) {
       }
       handleKeyboardShortcuts(true);
       // Override console *after* creating a sandbox around eval
-      overrideConsole(document.getElementById('console'));
+      overrideConsole(document.getElementById('console') as HTMLElement);
     }
     handleAsync().catch((e) => console.error(e));
     // Functional way of calling componentWillUnmount
     return function cleanup() {
       window.removeEventListener('beforeunload', boundOnUnmount, false);
-      boundOnUnmount();
+      boundOnUnmount().catch((e) => console.error(e));
       // remove override
       console.log = defaultLog;
       console.warn = defaultWarn;
@@ -341,10 +381,12 @@ function ValidRoom({ room, role, ws }) {
         </pre>
         {!hasSubmission && ROLE_INSTRUCTOR === role && (
           <Modal title="Wait for submission">
-            <p>No submission has been made yet. Please wait...</p>
-            <p>
-              Go back to the <Link to="/">Lobby</Link>.
-            </p>
+            <>
+              <p>No submission has been made yet. Please wait...</p>
+              <p>
+                Go back to the <Link to="/">Lobby</Link>.
+              </p>
+            </>
           </Modal>
         )}
       </div>

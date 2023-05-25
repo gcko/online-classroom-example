@@ -1,17 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { ExclamationCircle } from 'react-bootstrap-icons';
 import './Lobby.scss';
-import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants';
-import Layout from '../Layout';
-import RoomCard from './room-card/RoomCard';
+import { Role, Room } from 'src/types.ts';
+import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants.ts';
+import Layout from '../Layout.tsx';
+import RoomCard from './room-card/RoomCard.tsx';
 
-function Lobby(props) {
+type Props = {
+  ws: WebSocket;
+};
+function Lobby({ ws }: Props) {
   // Store the state of changes
   const [isValid, setIsValid] = useState(false);
-  const [room, setRoom] = useState(null);
-  const [role, setRole] = useState(null);
-  const changed = useRef({});
+  const [room, setRoom] = useState<Room | undefined>(undefined);
+  const [role, setRole] = useState<Role | undefined>(undefined);
+  const changed = useRef<Record<string, boolean>>({});
 
   useEffect(
     () =>
@@ -22,20 +26,25 @@ function Lobby(props) {
     []
   );
 
-  async function formValidator(e) {
-    const targetEl = e.target;
+  async function formValidator(e: FormEvent) {
+    const targetEl = e.target as HTMLInputElement;
     const parentEl = targetEl.parentElement;
-    const roleSelectEl = document.getElementById('role-select');
+    const roleSelectEl = document.getElementById(
+      'role-select'
+    ) as HTMLSelectElement;
     // Default value is invalid
-    if ([ROLE_STUDENT, ROLE_INSTRUCTOR].indexOf(roleSelectEl.value) < 0) {
-      roleSelectEl.setCustomValidity('You must select a role');
-    } else {
-      roleSelectEl.setCustomValidity('');
-      // set role state
-      setRole(roleSelectEl.value);
+    if (roleSelectEl) {
+      if ([ROLE_STUDENT, ROLE_INSTRUCTOR].indexOf(roleSelectEl.value) < 0) {
+        roleSelectEl.setCustomValidity('You must select a role');
+      } else {
+        roleSelectEl.setCustomValidity('');
+        // set role state
+        setRole(roleSelectEl.value as Role);
+      }
     }
     if (
       !(targetEl.id in changed.current) &&
+      parentEl &&
       parentEl.classList.contains('form-group')
     ) {
       // Add validation UI state after initial change only
@@ -44,9 +53,12 @@ function Lobby(props) {
     }
     if (targetEl.id === 'room-id') {
       // Always unset the room to ensure valid state of form
-      setRoom(null);
+      setRoom(undefined);
     }
     // Specifically check if the roomId is a potentially valid roomId
+    const holderElement = document.getElementById(
+      'not-real-room-id'
+    ) as HTMLElement;
     if (targetEl.id === 'room-id' && !targetEl.validity.patternMismatch) {
       const maybeRoomId = targetEl.value;
       const response = await fetch(`/api/rooms/${maybeRoomId}`);
@@ -56,20 +68,21 @@ function Lobby(props) {
         setRoom(data);
         // remove validation message if it existed
         targetEl.setCustomValidity('');
-        document.getElementById('not-real-room-id').classList.add('d-none');
+        holderElement.classList.add('d-none');
       } else {
         // add validation message when room is not valid
         targetEl.setCustomValidity('This room has not been created yet.');
-        document.getElementById('not-real-room-id').classList.remove('d-none');
+        holderElement.classList.remove('d-none');
       }
     }
     // Remove "not real room ID" tooltip even if the validation fails
     if (targetEl.id === 'room-id' && targetEl.validity.patternMismatch) {
       targetEl.setCustomValidity('');
-      document.getElementById('not-real-room-id').classList.add('d-none');
+      holderElement.classList.add('d-none');
     }
     // Connect state validity to the form's validity
-    setIsValid(targetEl.form.checkValidity());
+    const formEl = targetEl.form as HTMLFormElement;
+    setIsValid(formEl.checkValidity());
   }
 
   return (
@@ -106,7 +119,7 @@ function Lobby(props) {
               id="room-id"
               placeholder="Enter Room ID: e.g. AB12CD34"
               pattern="^[0-9a-zA-Z]{8}$"
-              maxLength="8"
+              maxLength={8}
               required
             />
             <div id="not-real-room-id" className="invalid-tooltip d-none">
@@ -122,10 +135,9 @@ function Lobby(props) {
           </div>
           <RoomCard
             isValid={isValid}
-            room={room}
-            role={role}
-            ws={props.ws}
-            key={props.ws}
+            room={room as Room}
+            role={role as Role}
+            ws={ws}
           />
         </form>
       </div>

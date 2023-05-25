@@ -1,12 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import pluralize from 'pluralize';
-import WaitingArea from '../WaitingArea';
+import { Role, Room } from 'src/types.ts';
+import WaitingArea from 'src/lobby/WaitingArea.tsx';
 
-function EnabledCardContents({ room, role, ws }) {
+type Props = {
+  room: Room;
+  role: Role;
+  ws: WebSocket;
+};
+function EnabledCardContents({ room, role, ws }: Props) {
   const [theRoom, setTheRoom] = useState(room);
   const currentWs = useRef(ws);
 
-  function handleWebsocketMessage(e) {
+  function handleWebsocketMessage(e: MessageEvent) {
     try {
       const msg = JSON.parse(e.data);
       if (msg.event === 'change:attendance') {
@@ -45,7 +51,7 @@ function EnabledCardContents({ room, role, ws }) {
         {(theRoom || room).attendance.map((attendee) => (
           <small key={attendee.name} className="d-block">
             {attendee.amount}{' '}
-            {pluralize(attendee.label, parseInt(attendee.amount, 10))}
+            {pluralize(attendee.label, parseInt(String(attendee.amount), 10))}
           </small>
         ))}
       </div>

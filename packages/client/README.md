@@ -27,7 +27,7 @@ following:
 * [Pluralize](https://github.com/blakeembrey/pluralize) - A simple plugin that adds the ability
  to modify a singular to a plural, and vice-versa, based on a `count`.
 * [React Router](https://reactrouter.com/) - Adds the ability to turn the app into a full
- SPA, hooking up `history` with React context. See [current implementation](src/index.js).
+ SPA, hooking up `history` with React context. See [current implementation](src/index.tsx).
 
 ## Tests
 
@@ -35,4 +35,4 @@ In the project directory, you can run:
 
 ### `npm run test`
 
-To see a brief list of tests, please check [Lobby.test.js](src/lobby/Lobby.test.js).
+To see a brief list of tests, please check [Lobby.test.tsx](src/lobby/Lobby.test.tsx).

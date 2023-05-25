@@ -2,7 +2,7 @@
 import React from 'react';
 import { Style } from 'react-style-tag';
 import './TermsOfService.scss';
-import Layout from '../Layout';
+import Layout from 'src/Layout.tsx';
 
 function TermsOfService() {
   return (

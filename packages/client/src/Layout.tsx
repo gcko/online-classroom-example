@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom';
 import React from 'react';
 
-function Layout(props) {
+type LayoutProps = {
+  children: React.ReactElement;
+};
+
+function Layout({ children }: LayoutProps) {
   return (
     <div>
       <nav className="navbar sticky-top bg-dark">
@@ -16,7 +20,7 @@ function Layout(props) {
         </div>
       </nav>
       <div className="amplify-app container-fluid">
-        <div className="content">{props.children}</div>
+        <div className="content">{children}</div>
         <footer>
           <Link to="/terms-of-service">Terms of Service</Link>
           <a href="mailto:jared.scott@variable.team">Contact support</a>

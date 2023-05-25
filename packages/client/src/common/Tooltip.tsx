@@ -1,10 +1,14 @@
 import React from 'react';
 
-function Tooltip(props) {
+type Props = {
+  children: React.ReactElement;
+};
+
+function Tooltip({ children }: Props) {
   return (
     <div className="tooltip fade bs-tooltip-right show" role="tooltip">
       <div className="arrow" />
-      <div className="tooltip-inner">{props.children}</div>
+      <div className="tooltip-inner">{children}</div>
     </div>
   );
 }
