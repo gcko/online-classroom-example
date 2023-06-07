@@ -3,7 +3,7 @@
     "baseUrl": ".",
     "sourceRoot": "src",
     "module": "commonjs",
-    "target": "esnext",
+    "target": "ES2022",
     "sourceMap": true,
     "declaration": false,
     "experimentalDecorators": true,
@@ -22,8 +22,8 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "lib": [
-      "es7",
-      "dom",
+      "ES2022",
+      "DOM",
       "ESNext.AsyncIterable"
     ],
     "typeRoots": [
@@ -31,7 +31,8 @@
     ]
   },
   "include": [
-    "src"
+    "src",
+    "../../node_modules/@types/jest/index.d.ts"
   ],
   "linterOptions": {
     "exclude": []
