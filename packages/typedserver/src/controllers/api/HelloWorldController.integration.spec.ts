@@ -1,7 +1,7 @@
 import { PlatformTest } from '@tsed/common';
 import SuperTest from 'supertest';
-import { HelloWorldController } from './HelloWorldController';
-import { Server } from '../../Server';
+import { RoomController } from 'src/controllers/api/RoomController';
+import { Server } from 'src/Server';
 
 describe('HelloWorldController', () => {
   let request: SuperTest.SuperTest<SuperTest.Test>;
@@ -9,7 +9,7 @@ describe('HelloWorldController', () => {
   beforeEach(
     PlatformTest.bootstrap(Server, {
       mount: {
-        '/': [HelloWorldController]
+        '/': [RoomController]
       }
     })
   );

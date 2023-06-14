@@ -24,7 +24,9 @@
     "lib": [
       "ES2022",
       "DOM",
-      "ESNext.AsyncIterable"
+      "ESNext.AsyncIterable",
+      "webworker",
+      "dom"
     ],
     "typeRoots": [
       "./node_modules/@types"

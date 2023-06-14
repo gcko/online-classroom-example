@@ -9,10 +9,9 @@ import Tooltip from 'src/common/Tooltip.tsx';
 type Props = {
   room: Room;
   role: Role;
-  ws: WebSocket;
 };
 
-function WaitingArea({ room, role, ws }: Props) {
+function WaitingArea({ room, role }: Props) {
   function isRoleFull(rm: Room, attendee: Role) {
     return (
       rm.attendance.filter(
@@ -79,7 +78,7 @@ function WaitingArea({ room, role, ws }: Props) {
       <Routes>
         <Route
           path="/room/:roomId/:role"
-          element={<ValidRoom room={room} role={role} ws={ws} key={room.id} />}
+          element={<ValidRoom room={room} role={role} key={room.id} />}
         />
       </Routes>
     </>

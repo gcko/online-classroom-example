@@ -1,22 +1,29 @@
 import { join } from 'path';
-import { Configuration, Inject } from '@tsed/di';
-import { PlatformApplication } from '@tsed/common';
+import { Inject } from '@tsed/di';
+import { Configuration, PlatformApplication } from '@tsed/common';
 import '@tsed/platform-express'; // /!\ keep this import
 import '@tsed/ajv';
 import '@tsed/swagger';
 import { config } from 'src/config';
-import * as rest from './controllers/rest/index';
+import '@tsed/socketio';
+import * as api from './controllers/api/index';
 import * as pages from './controllers/pages/index';
 
 @Configuration({
   ...config,
   acceptMimes: ['application/json'],
-  httpPort: process.env.PORT || 8083,
+  httpPort: process.env.PORT || 3333,
   httpsPort: false, // CHANGE
   disableComponentsScan: true,
   mount: {
-    '/rest': [...Object.values(rest)],
+    '/api': [...Object.values(api)],
     '/': [...Object.values(pages)]
+  },
+  componentsScan: ['./services/**/**.ts'],
+  socketIO: {
+    cors: {
+      origin: 'http://localhost:3000'
+    }
   },
   swagger: [
     {

@@ -29,10 +29,7 @@ function resolveAfterNSeconds(num: number) {
   });
 }
 
-type Props = {
-  ws: WebSocket;
-};
-function Classroom({ ws }: Props) {
+function Classroom() {
   const { roomId, role } = useParams();
   const [room, setRoom] = useState<Room | undefined>(undefined);
   const [isValid, setIsValid] = useState<boolean | 'pending'>('pending');
@@ -59,7 +56,6 @@ function Classroom({ ws }: Props) {
       <ValidRoom
         room={room as Room}
         role={role as Role}
-        ws={ws}
         key={(room as Room).id}
       />
     );
@@ -88,9 +84,7 @@ function Classroom({ ws }: Props) {
         <Routes>
           <Route
             path=":roomId/:role/*"
-            element={
-              <ValidRoom room={room as Room} role={role as Role} ws={ws} />
-            }
+            element={<ValidRoom room={room as Room} role={role as Role} />}
           />
         </Routes>
       </>
