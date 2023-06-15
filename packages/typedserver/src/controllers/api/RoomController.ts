@@ -1,115 +1,29 @@
-/**
- * @swagger
- * tags:
- *   name: Rooms
- *   description: Room access
- */
-
 import { Controller } from '@tsed/di';
-import { Get, Post, Put } from '@tsed/schema';
+import { Description, Get, Post, Put, Returns, Summary } from '@tsed/schema';
 import { RoomService } from 'src/services/api/RoomService';
-import { Room, Submission } from 'src/types';
+import { Room } from 'src/types';
 import { BodyParams, PathParams } from '@tsed/platform-params';
 import { NotFound } from '@tsed/exceptions';
+import { RoomModel } from 'src/models/RoomModel';
+import { SubmissionModel } from 'src/models/SubmissionModel';
 
 @Controller('/rooms')
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
-  /**
-   * @swagger
-   * path:
-   *  /rooms/:
-   *    get:
-   *      summary: Get a list of rooms
-   *      tags: [Rooms]
-   *      responses:
-   *        "200":
-   *          description: A list of Room schemas
-   *          content:
-   *            application/json:
-   *              schema:
-   *                type: array
-   *                items:
-   *                  $ref: '#/components/schemas/Room'
-   *              examples:
-   *                Example with rooms:
-   *                  value:
-   *                    [
-   *                      {
-   *                        "id": "11111111",
-   *                        "name": "Javascript 101",
-   *                        "submissionId": "1",
-   *                        "attendance": [
-   *                          {
-   *                            "name": "student",
-   *                            "label": "Student",
-   *                            "amount": 0,
-   *                          },
-   *                          {
-   *                            "name": "instructor",
-   *                            "label": "Instructor",
-   *                            "amount": 0,
-   *                          }
-   *                        ]
-   *                      },
-   *                      {
-   *                        "id": "2222AAAA",
-   *                        "name": "Javascript 102",
-   *                        "submissionId": "1",
-   *                        "attendance": [
-   *                          {
-   *                            "name": "student",
-   *                            "label": "Student",
-   *                            "amount": 1,
-   *                          },
-   *                          {
-   *                            "name": "instructor",
-   *                            "label": "Instructor",
-   *                            "amount": 1,
-   *                          }
-   *                        ]
-   *                      },
-   *                    ]
-   *                Example with no rooms:
-   *                  value:
-   *                    [
-   *                      {
-   *                      }
-   *                    ]
-   */
   @Get('/')
-  async findAll(): Promise<Room[]> {
-    return this.roomService.rooms;
+  @Summary('Get a list of rooms')
+  @Description('Return a list of Rooms')
+  @Returns(200, Array).Of(RoomModel).Description('Success')
+  async findAll(): Promise<RoomModel[]> {
+    return await Promise.resolve(this.roomService.rooms);
   }
 
-  /**
-   * @swagger
-   * path:
-   *  /rooms/{id}:
-   *    get:
-   *      summary: Get a room by id
-   *      tags: [Rooms]
-   *      parameters:
-   *        - name: id
-   *          in: path
-   *          description: ID of room to fetch
-   *          required: true
-   *          schema:
-   *            type: string
-   *            pattern: ^[0-9a-zA-Z]{8}$
-   *      responses:
-   *        "200":
-   *          description: A Room schema
-   *          content:
-   *            application/json:
-   *              schema:
-   *                type: object
-   *                $ref: '#/components/schemas/Room'
-   *       "404":
-   *         description: Room not Found
-   */
   @Get('/:roomId')
-  async findOne(@PathParams('roomId') roomId: string): Promise<Room> {
+  @Summary('Get a room by id')
+  @Description('Return a Room by given Room id')
+  @Returns(200, RoomModel)
+  @Returns(404).Description('Not Found')
+  async findOne(@PathParams('roomId') roomId: string): Promise<RoomModel> {
     const room = await this.roomService.getRoom(roomId);
     if (room) {
       return room;
@@ -117,34 +31,12 @@ export class RoomController {
     throw new NotFound('Room Not Found');
   }
 
-  /**
-   * @swagger
-   * path:
-   *  /rooms/{id}/submission:
-   *    get:
-   *      summary: Get a specific room's submission
-   *      tags: [Rooms]
-   *      parameters:
-   *        - name: id
-   *          in: path
-   *          description: ID of room to fetch
-   *          required: true
-   *          schema:
-   *            type: string
-   *            pattern: ^[0-9a-zA-Z]{8}$
-   *      responses:
-   *        "200":
-   *          description: A Submission schema
-   *          content:
-   *            application/json:
-   *              schema:
-   *                type: object
-   *                $ref: '#/components/schemas/Submission'
-   *        "404":
-   *          description: Submission not Found
-   */
   @Get('/:roomId/submission')
-  async findOneSubmission(@PathParams('roomId') roomId: string): Promise<Submission> {
+  @Summary('Get a submission for a Room')
+  @Description('Return a Submission for a Room by given Room id')
+  @Returns(200, SubmissionModel)
+  @Returns(404).Description('Not Found')
+  async findOneSubmission(@PathParams('roomId') roomId: string): Promise<SubmissionModel> {
     const submission = await this.roomService.getRoomSubmission(roomId);
     if (submission) {
       return submission;
@@ -152,88 +44,12 @@ export class RoomController {
     throw new NotFound('No Submission Found');
   }
 
-  /**
-   * @swagger
-   * path:
-   *  /rooms/{id}:
-   *    put:
-   *      summary: Put an update to a room by id
-   *      tags: [Rooms]
-   *      parameters:
-   *        - name: id
-   *          in: path
-   *          description: ID of room to fetch
-   *          required: true
-   *          schema:
-   *            type: string
-   *            pattern: ^[0-9a-zA-Z]{8}$
-   *      requestBody:
-   *        content:
-   *          application/json:
-   *            schema:
-   *              type: object
-   *              required:
-   *                - name
-   *                - attendance
-   *              properties:
-   *                name:
-   *                  type: string
-   *                  description: Name of the room.
-   *                submissionId:
-   *                  type: string
-   *                  pattern: ^\d.*$
-   *                  description: unique ID for a submission.
-   *                attendance:
-   *                  type: array
-   *                  items:
-   *                    type: object
-   *                    required:
-   *                      - name
-   *                      - label
-   *                      - amount
-   *                    minItems: 2
-   *                    maxItems: 2
-   *                    uniqueItems: true
-   *                    properties:
-   *                      name:
-   *                        type: string
-   *                        enum:
-   *                          - student
-   *                          - instructor
-   *                        description: Machine-readable name of the attendee. All lowercase.
-   *                      label:
-   *                        type: string
-   *                        enum:
-   *                          - Student
-   *                          - Instructor
-   *                        description: Human-readable name of the attendee. Sentence case.
-   *                      amount:
-   *                        type: integer
-   *                        maximum: 1
-   *                        minimum: 0
-   *                        description: The amount of attendees of this certain type currently in the room. 0 or 1.
-   *                  description: a list of objects containing the amount of each type of user in the room. Required.
-   *      responses:
-   *        "200":
-   *          description: A Room schema
-   *          content:
-   *            application/json:
-   *              schema:
-   *                type: object
-   *                $ref: '#/components/schemas/Room'
-   *        "404":
-   *          description: The supplied room ID does not exist
-   *          content:
-   *            application/json:
-   *              schema:
-   *                type: object
-   *                properties:
-   *                  error:
-   *                    type: string
-   *                    description: The error message supplied from the server.
-   */
   @Put('/:roomId')
-  async updateRoom(@PathParams('roomId') roomId: string, @BodyParams('body') room: Room): Promise<Room> {
+  @Summary('Update a Room Object with the provided Room')
+  @Description('Update a Room Object with the provided Room and roomId')
+  @Returns(200, RoomModel)
+  @Returns(404).Description('Not Found')
+  async updateRoom(@PathParams('roomId') roomId: string, @BodyParams('body') room: RoomModel): Promise<RoomModel> {
     const status = await this.roomService.updateRoom(roomId, room);
     if (!status) {
       throw new NotFound(`Room ${roomId} does not exist`);
@@ -242,6 +58,9 @@ export class RoomController {
   }
 
   @Post('/:roomId/:role/decrement')
+  @Summary('Decrement the number of instructors or students for a particular Room')
+  @Description('Decrement the number of instructors or students for a particular Room')
+  @Returns(204)
   async decrementRole(@PathParams('roomId') roomId: string, @PathParams('role') role: 'instructor' | 'student'): Promise<void> {
     // this is for navigator.sendBeacon;
     // the browser does not listen for a result, do not send a result

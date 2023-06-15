@@ -3,7 +3,7 @@ import SuperTest from 'supertest';
 import { RoomController } from 'src/controllers/api/RoomController';
 import { Server } from 'src/Server';
 
-describe('HelloWorldController', () => {
+describe('RoomController', () => {
   let request: SuperTest.SuperTest<SuperTest.Test>;
 
   beforeEach(
@@ -19,9 +19,9 @@ describe('HelloWorldController', () => {
 
   afterEach(PlatformTest.reset);
 
-  it('should call GET /hello-world', async () => {
-    const response = await request.get('/hello-world').expect(200);
+  it('should call GET /', async () => {
+    const response = await request.get('/').expect(200);
 
-    expect(response.text).toEqual('hello');
+    expect(response.body.length).toBeGreaterThan(0);
   });
 });

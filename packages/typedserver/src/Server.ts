@@ -8,6 +8,7 @@ import { config } from 'src/config';
 import '@tsed/socketio';
 import * as api from './controllers/api/index';
 import * as pages from './controllers/pages/index';
+import { version } from '../package.json';
 
 @Configuration({
   ...config,
@@ -28,7 +29,23 @@ import * as pages from './controllers/pages/index';
   swagger: [
     {
       path: '/doc',
-      specVersion: '3.0.1'
+      specVersion: '3.0.1',
+      spec: {
+        info: {
+          title: 'Amplify API documentation',
+          version,
+          description: 'Documentation for the Amplify API',
+          license: {
+            name: 'MIT',
+            url: 'https://opensource.org/licenses/MIT'
+          },
+          contact: {
+            name: 'Jared Scott',
+            url: 'https://variable.iteam',
+            email: 'jared.scott@variable.team'
+          }
+        }
+      }
     }
   ],
   middlewares: [
