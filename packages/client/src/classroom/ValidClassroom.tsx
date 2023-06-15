@@ -7,7 +7,8 @@ import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/webpack-resolver';
-import { Role, Room } from 'src/types.ts';
+import { Role, Room, Submission } from 'src/types.ts';
+import socket from 'src/socket.ts';
 import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants.ts';
 import './ValidClassroom.scss';
 import Modal from '../common/Modal.tsx';
@@ -247,10 +248,9 @@ const handleSubmitCode = async (room: Room) => {
 type Props = {
   room: Room;
   role: Role;
-  ws: WebSocket;
 };
 // Convert ValidRoom to a functional component
-function ValidRoom({ room, role, ws }: Props) {
+function ValidRoom({ room, role }: Props) {
   const [hasSubmission, setHasSubmission] = useState(false);
   const aceEditor: React.RefObject<AceEditor> = React.createRef();
   const boundOnUnmount = onUnmountWithParams.bind(undefined, room.id, role);
@@ -261,20 +261,11 @@ function ValidRoom({ room, role, ws }: Props) {
   const defaultClear = console.clear;
   // because this is being used within useEffect, it needs to be cached using useCallback
   const handleWebsocketMessage = useCallback(
-    (e: MessageEvent) => {
-      try {
-        const msg = JSON.parse(e.data);
-        // only submit submission changes on the instructor view
-        if (msg.event === 'change:submission') {
-          setHasSubmission(() => true);
-          if (aceEditor.current) {
-            aceEditor.current.editor.selectAll();
-            aceEditor.current.editor.insert(msg.data.text);
-          }
-        }
-      } catch (error) {
-        console.warn(`Message was not JSON parsable. resp: ${e.data}`);
-        console.warn(`Error: ${error}`);
+    (submission: Submission) => {
+      setHasSubmission(() => true);
+      if (aceEditor.current) {
+        aceEditor.current.editor.selectAll();
+        aceEditor.current.editor.insert(submission.text);
       }
     },
     [aceEditor]
@@ -296,9 +287,7 @@ function ValidRoom({ room, role, ws }: Props) {
           setHasSubmission(() => false);
         }
         // setup listener only for Instructor
-        if (ws) {
-          ws.addEventListener('message', handleWebsocketMessage);
-        }
+        socket.on('change:submission', handleWebsocketMessage);
       }
       handleKeyboardShortcuts(true);
       // Override console *after* creating a sandbox around eval
@@ -315,9 +304,7 @@ function ValidRoom({ room, role, ws }: Props) {
       console.error = defaultError;
       console.clear = defaultClear;
       handleKeyboardShortcuts(false);
-      if (ws) {
-        ws.removeEventListener('message', handleWebsocketMessage);
-      }
+      socket.off('change:submission', handleWebsocketMessage);
     };
   }, [
     aceEditor,
@@ -330,7 +317,6 @@ function ValidRoom({ room, role, ws }: Props) {
     role,
     room.id,
     room.submissionId,
-    ws,
   ]);
 
   return (

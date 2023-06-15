@@ -7,10 +7,7 @@ import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants.ts';
 import Layout from '../Layout.tsx';
 import RoomCard from './room-card/RoomCard.tsx';
 
-type Props = {
-  ws: WebSocket;
-};
-function Lobby({ ws }: Props) {
+function Lobby() {
   // Store the state of changes
   const [isValid, setIsValid] = useState(false);
   const [room, setRoom] = useState<Room | undefined>(undefined);
@@ -133,12 +130,7 @@ function Lobby({ ws }: Props) {
               <ExclamationCircle /> May only contain alphanumeric characters
             </div>
           </div>
-          <RoomCard
-            isValid={isValid}
-            room={room as Room}
-            role={role as Role}
-            ws={ws}
-          />
+          <RoomCard isValid={isValid} room={room as Room} role={role as Role} />
         </form>
       </div>
     </Layout>

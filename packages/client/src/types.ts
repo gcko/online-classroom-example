@@ -10,5 +10,10 @@ interface Room {
   submissionId: number;
   attendance: Attendance[];
 }
+interface Submission {
+  id: string;
+  text: string;
+  roomId: string;
+}
 
-export { Attendance, Room, Role };
+export { Attendance, Room, Role, Submission };

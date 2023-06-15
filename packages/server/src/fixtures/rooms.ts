@@ -1,3 +1,5 @@
+import { Rooms } from 'src/types';
+
 /**
  * @swagger
  *  components:
@@ -53,7 +55,7 @@
  *                  description: The amount of attendees of this certain type currently in the room. 0 or 1.
  *            description: a list of objects containing the amount of each type of user in the room. Required.
  */
-const rooms = {
+export default {
   11111111: {
     id: '11111111',
     name: 'Javascript 101',
@@ -62,14 +64,14 @@ const rooms = {
       {
         name: 'instructor',
         label: 'Instructor',
-        amount: 0,
+        amount: 0
       },
       {
         name: 'student',
         label: 'Student',
-        amount: 0,
-      },
-    ],
+        amount: 0
+      }
+    ]
   },
   11111112: {
     id: '11111112',
@@ -78,14 +80,14 @@ const rooms = {
       {
         name: 'instructor',
         label: 'Instructor',
-        amount: 0,
+        amount: 0
       },
       {
         name: 'student',
         label: 'Student',
-        amount: 0,
-      },
-    ],
+        amount: 0
+      }
+    ]
   },
   11111113: {
     id: '11111113',
@@ -94,15 +96,13 @@ const rooms = {
       {
         name: 'instructor',
         label: 'Instructor',
-        amount: 0,
+        amount: 0
       },
       {
         name: 'student',
         label: 'Student',
-        amount: 0,
-      },
-    ],
-  },
-};
-
-module.exports = rooms;
+        amount: 0
+      }
+    ]
+  }
+} as Rooms;

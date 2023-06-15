@@ -1,3 +1,5 @@
+import { Submissions } from 'src/types';
+
 /**
  * @swagger
  *  components:
@@ -21,12 +23,10 @@
  *            pattern: ^[0-9a-zA-Z]{8}$
  *            description: Foreign key to an existing room.
  */
-const submissions = {
+export default {
   1: {
     id: '1',
     text: 'console.log("I am submitted code!")',
-    roomId: '11111111',
-  },
-};
-
-module.exports = submissions;
+    roomId: '11111111'
+  }
+} as Submissions;

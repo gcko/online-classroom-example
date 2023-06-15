@@ -1,48 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import pluralize from 'pluralize';
 import { Role, Room } from 'src/types.ts';
 import WaitingArea from 'src/lobby/WaitingArea.tsx';
+import socket from 'src/socket.ts';
 
 type Props = {
   room: Room;
   role: Role;
-  ws: WebSocket;
 };
-function EnabledCardContents({ room, role, ws }: Props) {
+function EnabledCardContents({ room, role }: Props) {
   const [theRoom, setTheRoom] = useState(room);
-  const currentWs = useRef(ws);
-
-  function handleWebsocketMessage(e: MessageEvent) {
-    try {
-      const msg = JSON.parse(e.data);
-      if (msg.event === 'change:attendance') {
-        // update room
-        setTheRoom(msg.data);
-      }
-    } catch (error) {
-      console.warn(`Message was not JSON parsable. resp: ${e.data}`);
-      console.warn(`Error: ${error}`);
-    }
-  }
 
   useEffect(() => {
-    // use a referenced version of the websocket
-    if (currentWs.current) {
-      currentWs.current.addEventListener('message', handleWebsocketMessage);
-    } else {
-      console.warn('websocket is not defined');
-    }
+    socket.on('change:attendance', setTheRoom);
     return function cleanup() {
-      // clean up from previous render
-      if (ws !== currentWs.current) {
-        currentWs.current.removeEventListener(
-          'message',
-          handleWebsocketMessage
-        );
-        currentWs.current = ws;
-      }
+      socket.off('change:attendance', setTheRoom);
     };
-  });
+  }, []);
 
   return (
     <div className="card-body row align-items-center">
@@ -55,7 +29,7 @@ function EnabledCardContents({ room, role, ws }: Props) {
           </small>
         ))}
       </div>
-      <WaitingArea room={theRoom || room} role={role} ws={ws} />
+      <WaitingArea room={theRoom || room} role={role} />
     </div>
   );
 }
