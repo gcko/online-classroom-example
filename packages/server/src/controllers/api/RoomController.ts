@@ -1,7 +1,7 @@
 import { Controller } from '@tsed/di';
 import { Description, Get, Post, Put, Returns, Summary } from '@tsed/schema';
 import { RoomService } from 'src/services/api/RoomService';
-import { Room } from 'src/types';
+import { Attendance, Room } from 'src/types';
 import { BodyParams, PathParams } from '@tsed/platform-params';
 import { NotFound } from '@tsed/exceptions';
 import { RoomModel } from 'src/models/RoomModel';
@@ -49,12 +49,12 @@ export class RoomController {
   @Description('Update a Room Object with the provided Room and roomId')
   @Returns(200, RoomModel)
   @Returns(404).Description('Not Found')
-  async updateRoom(@PathParams('roomId') roomId: string, @BodyParams('body') room: RoomModel): Promise<RoomModel> {
-    const status = await this.roomService.updateRoom(roomId, room);
-    if (!status) {
-      throw new NotFound(`Room ${roomId} does not exist`);
+  async updateRoom(@PathParams('roomId') roomId: string, @BodyParams('attendance') attendance: Attendance[]): Promise<RoomModel> {
+    const status = await this.roomService.updateAttendance(roomId, attendance);
+    if (status) {
+      return status as Room;
     }
-    return status as Room;
+    throw new NotFound(`Room ${roomId} does not exist`);
   }
 
   @Post('/:roomId/:role/decrement')

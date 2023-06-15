@@ -16,7 +16,7 @@
 ###############################################################################
 ARG NODE_VERSION=20
 
-FROM node:${NODE_VERSION}-alpine as build
+FROM node:${NODE_VERSION}-alpine AS build
 WORKDIR /opt
 
 COPY package.json package-lock.json tsconfig.json tsconfig.compile.json .barrelsby.json ./
@@ -29,7 +29,7 @@ COPY ./src ./src
 
 RUN npm run build
 
-FROM node:${NODE_VERSION}-alpine as runtime
+FROM node:${NODE_VERSION}-alpine AS runtime
 ENV WORKDIR /opt
 WORKDIR $WORKDIR
 

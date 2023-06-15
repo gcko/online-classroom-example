@@ -1,6 +1,6 @@
 import { Inject, InjectorService, OnInit, Service } from '@tsed/di';
 import rooms from 'src/fixtures/rooms';
-import { Rooms, Room, Submission } from 'src/types';
+import { Rooms, Room, Submission, Attendance } from 'src/types';
 import { SubmissionService } from 'src/services/api/SubmissionService';
 import { MySocketService } from 'src/services/MySocketService';
 
@@ -34,25 +34,16 @@ export class RoomService implements OnInit {
     }
   }
 
-  async updateRoom(roomId: string, body: Room): Promise<Room | boolean> {
+  async updateAttendance(roomId: string, attendance: Attendance[]): Promise<Room | boolean> {
     const room = await this.getRoom(roomId);
-    if (room && body != null) {
-      if (body.name != null) {
-        room.name = body.name;
-      }
-      if (body.submission != null) {
-        room.submissionId = await this.submissionService.createOrUpdateSubmission(room, body.submission);
-      }
-      if (body.attendance != null) {
-        room.attendance = body.attendance;
-        // trigger attendance change
-
-        await this.injector.emit('$attendanceChange', room);
-      }
-      return room;
+    if (room && attendance != null) {
+      room.attendance = attendance;
+      // trigger attendance change
+      await this.injector.emit('$attendanceChange', room);
+      return Promise.resolve(room);
     }
     // room did not exist
-    return false;
+    return Promise.resolve(false);
   }
 
   async decrementRoleAmount(roomId: string, role: 'student' | 'instructor'): Promise<void> {

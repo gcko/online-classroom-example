@@ -1,33 +1,36 @@
 {
-  "parser": "@babel/eslint-parser",
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "prettier",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "plugins": ["@typescript-eslint", "prettier"],
   "parserOptions": {
-    "requireConfigFile": false,
-    "babelOptions": {
-      "babelrc": false,
-      "configFile": false,
-      "presets": ["@babel/preset-env"]
-    }
+    "ecmaVersion": 2022,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
   },
-  "env": { "node": true, "jest": true },
-  "extends": ["airbnb-base", "prettier"],
-  "plugins": ["prettier"],
+  "env": {
+   "node": true,
+    "es6": true,
+    "jest": true
+  },
   "rules": {
-    "consistent-return": ["off"],
-    "import/no-extraneous-dependencies": [
-      "error",
-      {
-        "devDependencies": true
-      }
-    ],
+    "@typescript-eslint/no-inferrable-types": 0,
+    "@typescript-eslint/no-unused-vars": 2,
+    "@typescript-eslint/no-var-requires": 0,
     "prettier/prettier": [
       "error",
       {
-        "trailingComma": "es5",
-        "tabWidth": 2,
+        "printWidth": 140,
+        "singleQuote": true,
+        "jsxSingleQuote": true,
         "semi": true,
-        "singleQuote": true
+        "tabWidth": 2,
+        "bracketSpacing": true,
+        "arrowParens": "always",
+        "trailingComma": "none"
       }
-    ],
-    "prefer-destructuring": ["error", {"object": true, "array": false}]
+    ]
   }
 }

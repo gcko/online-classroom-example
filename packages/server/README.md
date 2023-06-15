@@ -8,11 +8,10 @@ In addition to the main overview, the server makes use of a few 3rd party librar
 
 For the back-end, the libraries in use are as follows:
 
-* [ws](https://github.com/websockets/ws) - "a Node.js WebSocket library". Simple and fast
- WebSocket client and server implementation. 
-* [nodemon](https://github.com/remy/nodemon) - Nodemon will monitor any changes in 
- the source directories and automatically restart the node app. `nodemon` replaced `node`
- to run the [start script](package.json). 
+* [Ts.ED](https://tsed.io/) - Ts.ED is a Node.js Framework on top of Express/Koa.js. Written in Typescript,
+  it helps you build your server-side application easily and quickly.
+* [socket.io](https://socket.io/) - Bidirectional and low-latency communication for every platform.
+  WebSocket implementation.
 
 ## Tests
 
@@ -20,6 +19,22 @@ In the project directory, you can run:
 
 ### `jest`
 
-To see a brief list of tests, please check [app.test.js](src/app.test.js).
+To see a brief list of tests, please check the spec.ts files. Example: [RoomController.spec.ts](src/controllers/api/RoomController.spec.ts).
 
-Also check out the integration tests surrounding the API endpoints, [here](src/test%20api%20endpoints.sh).
+Also check out the integration tests, [here](src/Server.integration.spec.ts).
+
+## Docker
+
+```
+# build docker image
+docker compose build
+
+# start docker image
+docker compose up
+```
+
+## Barrelsby
+
+This project uses [barrelsby](https://www.npmjs.com/package/barrelsby) to generate index files to import the controllers.
+
+Edit [.barreslby.json](.barrelsby.json) to customize it.
