@@ -6,7 +6,7 @@ import Lobby from 'src/lobby/Lobby.tsx';
 test('it has a role select dropdown', () => {
   const { getByRole } = render(
     <MemoryRouter>
-      <Lobby ws={new WebSocket('')} />
+      <Lobby />
     </MemoryRouter>
   );
 
@@ -18,7 +18,7 @@ test('it has a role select dropdown', () => {
 test('role: it has a student and instructor select option', () => {
   const { getAllByRole } = render(
     <MemoryRouter>
-      <Lobby ws={new WebSocket('')} />
+      <Lobby />
     </MemoryRouter>
   );
 
@@ -40,7 +40,7 @@ test('role: it has a student and instructor select option', () => {
 test('it has a room id text field', () => {
   const { getByRole } = render(
     <MemoryRouter>
-      <Lobby ws={new WebSocket('')} />
+      <Lobby />
     </MemoryRouter>
   );
 
@@ -52,7 +52,7 @@ test('it has a room id text field', () => {
 test('room id: it accepts an alphanumeric id eight characters long', () => {
   const { getByRole } = render(
     <MemoryRouter>
-      <Lobby ws={new WebSocket('')} />
+      <Lobby />
     </MemoryRouter>
   );
 
@@ -65,7 +65,7 @@ test('room id: it accepts an alphanumeric id eight characters long', () => {
 test('room id: it does not accept an id less than eight characters', () => {
   const { getByRole } = render(
     <MemoryRouter>
-      <Lobby ws={new WebSocket('')} />
+      <Lobby />
     </MemoryRouter>
   );
 
@@ -78,7 +78,7 @@ test('room id: it does not accept an id less than eight characters', () => {
 test('room id: it does not accept an id more than eight characters', () => {
   const { getByRole } = render(
     <MemoryRouter>
-      <Lobby ws={new WebSocket('')} />
+      <Lobby />
     </MemoryRouter>
   );
 
@@ -91,7 +91,7 @@ test('room id: it does not accept an id more than eight characters', () => {
 test('room id: it does not accept an id with non alphanumeric characters', () => {
   const { getByRole } = render(
     <MemoryRouter>
-      <Lobby ws={new WebSocket('')} />
+      <Lobby />
     </MemoryRouter>
   );
 
@@ -110,7 +110,7 @@ test('room id: it does not accept an id with non alphanumeric characters', () =>
 test('it has a button to enter a classroom', () => {
   const { getByRole } = render(
     <MemoryRouter>
-      <Lobby ws={new WebSocket('')} />
+      <Lobby />
     </MemoryRouter>
   );
 
@@ -122,7 +122,7 @@ test('it has a button to enter a classroom', () => {
 test('Form: it is valid when a valid room id is entered and the role is available', () => {
   const { container } = render(
     <MemoryRouter>
-      <Lobby ws={new WebSocket('')} />
+      <Lobby />
     </MemoryRouter>
   );
 

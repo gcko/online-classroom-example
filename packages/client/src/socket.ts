@@ -5,6 +5,6 @@ import { io } from 'socket.io-client';
 const URL =
   process.env.NODE_ENV === 'production'
     ? window.location
-    : 'ws://localhost:3334/socket';
+    : 'http://localhost:3333/socket';
 
-export default io(URL);
+export default io(URL, { path: '/socket.io/socket/' });

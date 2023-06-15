@@ -7,12 +7,12 @@ import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/webpack-resolver';
-import {Role, Room, Submission} from 'src/types.ts';
+import { Role, Room, Submission } from 'src/types.ts';
+import socket from 'src/socket.ts';
 import { ROLE_INSTRUCTOR, ROLE_STUDENT } from '../common/constants.ts';
 import './ValidClassroom.scss';
 import Modal from '../common/Modal.tsx';
 import Layout from '../Layout.tsx';
-import socket from 'src/socket.ts';
 
 // Custom Dev Console output
 // https://github.com/iambenkay/js-ide/blob/master/index.html
@@ -316,7 +316,7 @@ function ValidRoom({ room, role }: Props) {
     handleWebsocketMessage,
     role,
     room.id,
-    room.submissionId
+    room.submissionId,
   ]);
 
   return (

@@ -28,6 +28,9 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "node-sass": "^9.0.0",
+    "process": "^0.11.10"
+  }
 }
-

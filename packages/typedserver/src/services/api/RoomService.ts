@@ -36,14 +36,14 @@ export class RoomService implements OnInit {
 
   async updateRoom(roomId: string, body: Room): Promise<Room | boolean> {
     const room = await this.getRoom(roomId);
-    if (room) {
-      if ('name' in body && body.name) {
+    if (room && body != null) {
+      if (body.name != null) {
         room.name = body.name;
       }
-      if ('submission' in body && body.submission) {
+      if (body.submission != null) {
         room.submissionId = await this.submissionService.createOrUpdateSubmission(room, body.submission);
       }
-      if ('attendance' in body && body.attendance) {
+      if (body.attendance != null) {
         room.attendance = body.attendance;
         // trigger attendance change
 
